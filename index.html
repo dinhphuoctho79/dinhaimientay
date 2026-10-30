@@ -79,8 +79,20 @@
          Tiêu đề: line-height 1.25 + cân dòng (balance) để không lẻ chữ cuối dòng.
          Đoạn văn: text-wrap pretty để tránh chữ mồ côi. Số tiền/số liệu: tabular-nums cho thẳng cột. */
       body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-      h1,h2,h3,h4{line-height:1.25;text-wrap:balance}
-      p,.card .desc,.free-card p,.prop p,.why-item p,.custom-card p,.aff-tier p{text-wrap:pretty}
+      h1,h2,h3,h4,
+      .sec-head h2,.custom-panel h2,.aff-panel h2,.ctv-head h3,.zalo-popup-card h3{
+        line-height:1.25;text-wrap:balance;
+      }
+      /* Đoạn văn căn đều hai bên: mép trái và mép phải thẳng hàng trên cả máy tính và điện thoại.
+         hyphens:auto (theo lang="vi") giúp ngắt từ khi cần để dòng không bị giãn thưa. */
+      p{
+        text-align:justify;text-justify:inter-word;
+        hyphens:auto;-webkit-hyphens:auto;
+        text-wrap:pretty;
+      }
+      .card .desc,.free-card p,.prop p,.why-item p,.custom-card p,.aff-tier p{text-wrap:pretty}
+      /* Tiêu đề chính giữ bề ngang khối hero (760px): text-wrap:balance ở trên
+         tự chia hai dòng gần bằng nhau ở bề ngang này. */
       .btn{line-height:1.25;text-align:center}
       .price,.old-price,.stat b,.aff-stat b,.aff-dash-stat b,.aff-tier .pct,
       .ctv-price,.ctv-comm-box b,.ctv-rate b,.ctv-calc-result b,.total-line,
@@ -187,7 +199,11 @@
       }
       .stat b{font-size:26px;font-weight:900;color:var(--river-deep);display:block;line-height:1.1}
       .stat span{font-size:13px;color:var(--muted);font-weight:600}
-      @media (max-width:560px){ .stats{grid-template-columns:repeat(3,1fr);gap:8px} .stat{padding:12px 6px} .stat b{font-size:20px} .stat span{font-size:12px} }
+      @media (max-width:560px){
+        /* Màn hình nhỏ: hạ cỡ tiêu đề để vẫn ngắt đúng hai dòng cân nhau như trên máy tính */
+        h1{font-size:24px;line-height:1.22}
+        .stats{grid-template-columns:repeat(3,1fr);gap:8px} .stat{padding:12px 6px} .stat b{font-size:20px} .stat span{font-size:12px}
+      }
 
       /* ---------- Value props ---------- */
       .props{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0 6px}
