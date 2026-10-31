@@ -1270,7 +1270,7 @@
         <div class="faq">
           <details class="faq-item">
             <summary>Cách mua sản phẩm như thế nào? <span class="arr">+</span></summary>
-            <p>Bấm “Mua nhanh” ngay trên thẻ sản phẩm để đi thẳng tới thanh toán món đó, bấm “Xem chi tiết” để đọc kỹ rồi “Mua ngay”, hoặc “Thêm vào giỏ” để mua nhiều món một lượt. Mở Giỏ hàng → “Thanh toán” → điền họ tên, Gmail và số điện thoại → chuyển khoản theo thông tin shop hiện ra (nhớ giữ nguyên nội dung chuyển khoản là mã đơn) → bấm “Tôi đã chuyển khoản”.</p>
+            <p>Bấm “Mua nhanh” ngay trên thẻ sản phẩm để đi thẳng tới thanh toán món đó, bấm “Xem chi tiết” để đọc kỹ rồi “Mua ngay”, hoặc “Thêm vào giỏ” để mua nhiều món một lượt. Mở Giỏ hàng → “Thanh toán” → điền họ tên và số điện thoại (Gmail không bắt buộc) → chuyển khoản theo thông tin shop hiện ra (nhớ giữ nguyên nội dung chuyển khoản là mã đơn) → bấm “Tôi đã chuyển khoản”.</p>
           </details>
           <details class="faq-item">
             <summary>Tôi nhận sản phẩm bằng cách nào? <span class="arr">+</span></summary>
@@ -2594,13 +2594,14 @@
           + '<div class="row-between" style="font-size:16px;margin-top:8px"><span><b>Tổng cộng</b></span><b style="color:var(--river-deep);font-size:19px">'+fmt(total)+'</b></div></div>'
           + '<form id="coForm">'
           + '<div class="field"><label for="coName">Họ tên *</label><input id="coName" required placeholder="VD: Nguyễn Văn A" /></div>'
-          + '<div class="field"><label for="coEmail">Gmail nhận sản phẩm *</label><input id="coEmail" type="email" required placeholder="vidu@gmail.com" /><div class="hint">Link trợ lý / skill sẽ gửi vào Gmail này — gõ cho đúng nhé.</div></div>'
-          + '<div class="field"><label for="coPhone">Số điện thoại *</label><input id="coPhone" inputmode="tel" required placeholder="09xx xxx xxx" /></div>'
+          + '<div class="field"><label for="coEmail">Gmail nhận sản phẩm (không bắt buộc)</label><input id="coEmail" type="email" placeholder="vidu@gmail.com" /><div class="hint">Không bắt buộc — có Gmail thì shop gửi thêm link vào đây, không có thì shop giao qua Zalo.</div></div>'
+          + '<div class="field"><label for="coPhone">Số điện thoại (có Zalo) *</label><input id="coPhone" inputmode="tel" required placeholder="09xx xxx xxx" /><div class="hint">Shop liên hệ giao hàng qua Zalo số này — nhập đúng 10 số, bắt đầu bằng 0.</div></div>'
           + (hasDigital ? '<div class="field"><label>Cách nhận hàng *</label>'
           + '<label class="radio-row"><input type="radio" name="coDelivery" value="account" checked /> Nhận tài khoản mới — shop giao mail + mật khẩu qua Zalo</label>'
           + '<label class="radio-row"><input type="radio" name="coDelivery" value="upgrade" /> Nâng cấp tài khoản của tôi</label>'
           + '<input id="coUpgradeEmail" type="email" placeholder="Email tài khoản cần nâng cấp" style="display:none" />'
           + '<div class="hint">Chọn “Nâng cấp” thì nhập đúng email tài khoản bạn đang dùng — shop sẽ nâng cấp đúng tài khoản đó.</div></div>' : '')
+          + '<div id="coErr" class="disc-msg err" style="display:none"></div>'
           + '<button class="btn btn-river" type="submit" style="width:100%;justify-content:center;padding:14px">Tạo mã chuyển khoản — ' + fmt(total) + '</button>'
           + '</form>';
         openModal("checkoutModal");
@@ -2615,6 +2616,14 @@
         });
         $("coForm").addEventListener("submit", function(ev){
           ev.preventDefault();
+          var phoneDigits = $("coPhone").value.replace(/\D/g, "");
+          var coErr = $("coErr");
+          if (!/^0\d{9}$/.test(phoneDigits)){
+            if (coErr){ coErr.textContent = "Số điện thoại chưa đúng — nhập đủ 10 số, bắt đầu bằng 0 (VD: 0903123456). Shop chỉ liên hệ qua số này."; coErr.style.display = ""; }
+            $("coPhone").focus();
+            return;
+          }
+          if (coErr) coErr.style.display = "none";
           var delivery = "account", upgradeEmail = "";
           if (hasDigital){
             var selDelivery = document.querySelector('input[name="coDelivery"]:checked');
@@ -2625,7 +2634,7 @@
             code: "DINH" + Date.now().toString().slice(-6),
             name: $("coName").value.trim(),
             email: $("coEmail").value.trim().toLowerCase(),
-            phone: $("coPhone").value.trim(),
+            phone: phoneDigits,
             items: cart.slice(),
             total: total,
             delivery: delivery,
@@ -2697,7 +2706,7 @@
         $("coBody").innerHTML =
             '<div class="success-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>'
           + '<p style="text-align:center;margin:0 0 6px"><b>Cảm ơn bạn!</b> Đơn <b>'+o.code+'</b> đã được ghi nhận.</p>'
-          + '<p style="text-align:center;color:var(--muted);font-size:15px;margin:0 0 16px">Shop sẽ kiểm tra tiền về rồi nhắn Zalo giao link cho bạn. Sau khi giao xong, link cũng mở được trong Kho của tôi — bạn dùng đúng Gmail <b>'+esc(o.email)+'</b> và số điện thoại đã điền để mở kho.</p>'
+          + '<p style="text-align:center;color:var(--muted);font-size:15px;margin:0 0 16px">Shop sẽ kiểm tra tiền về rồi nhắn Zalo giao link cho bạn.' + (o.email ? ' Sau khi giao xong, link cũng mở được trong Kho của tôi — bạn dùng đúng Gmail <b>'+esc(o.email)+'</b> và số điện thoại đã điền để mở kho.' : ' Giữ lại mã đơn <b>'+o.code+'</b> — sau này tra cứu đơn bằng mã đơn và số điện thoại đã điền.') + '</p>'
           + o.items.map(function(id){
               var p = byId(id);
               return '<div class="vault-item"><div class="vi-name">'+esc(p.name)+'</div>'
