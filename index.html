@@ -541,6 +541,8 @@
       }
       .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--river)}
       .field .hint{font-size:13px;color:var(--muted);margin-top:5px}
+      .field label.radio-row{display:flex;gap:8px;align-items:flex-start;font-weight:400;font-size:15px;margin-bottom:8px;cursor:pointer}
+      .field label.radio-row input{width:auto;margin-top:3px;flex:none}
       .pay-box{
         background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;
       }
@@ -1268,7 +1270,7 @@
         <div class="faq">
           <details class="faq-item">
             <summary>Cách mua sản phẩm như thế nào? <span class="arr">+</span></summary>
-            <p>Bấm “Xem chi tiết” để đọc kỹ sản phẩm rồi “Mua ngay”, hoặc “Thêm vào giỏ” để mua nhiều món một lượt. Mở Giỏ hàng → “Thanh toán” → điền họ tên, Gmail và số điện thoại → chuyển khoản theo thông tin shop hiện ra (nhớ giữ nguyên nội dung chuyển khoản là mã đơn) → bấm “Tôi đã chuyển khoản”.</p>
+            <p>Bấm “Mua nhanh” ngay trên thẻ sản phẩm để đi thẳng tới thanh toán món đó, bấm “Xem chi tiết” để đọc kỹ rồi “Mua ngay”, hoặc “Thêm vào giỏ” để mua nhiều món một lượt. Mở Giỏ hàng → “Thanh toán” → điền họ tên, Gmail và số điện thoại → chuyển khoản theo thông tin shop hiện ra (nhớ giữ nguyên nội dung chuyển khoản là mã đơn) → bấm “Tôi đã chuyển khoản”.</p>
           </details>
           <details class="faq-item">
             <summary>Tôi nhận sản phẩm bằng cách nào? <span class="arr">+</span></summary>
@@ -1980,7 +1982,13 @@
         $("ordersCount").textContent = "Tổng số: " + adminOrders.length + " đơn";
         if (!adminOrders.length){ body.innerHTML = '<tr><td colspan="6" style="color:var(--muted)">Chưa có đơn hàng nào.</td></tr>'; return; }
         body.innerHTML = adminOrders.map(function(o){
-          var items = Array.isArray(o.items) ? o.items.map(function(it){ return (it && typeof it === "object") ? (it.name || it.id) : String(it); }).join("; ") : "";
+          var items = Array.isArray(o.items) ? o.items.map(function(it){
+            if (!it || typeof it !== "object") return String(it);
+            var s = it.name || it.id;
+            if (it.delivery === "upgrade") s += " — Nâng cấp: " + (it.upgrade_email || "");
+            else if (it.delivery === "account") s += " — Giao tài khoản mới";
+            return s;
+          }).join("; ") : "";
           var btns = "";
           if (o.status !== "delivered" && o.status !== "cancelled"){
             var digits = String(o.customer_phone || "").replace(/\D/g, "");
@@ -2473,6 +2481,7 @@
             + '<div class="card-btns">'
             + '<button class="btn" type="button" data-detail="'+p.id+'">Chi tiết</button>'
             + '<button class="btn btn-gold" type="button" data-add="'+p.id+'">Thêm vào giỏ</button>'
+            + '<button class="btn btn-gold" type="button" data-quick="'+p.id+'">Mua nhanh</button>'
             + '</div></div></article>';
         }).join("");
         bindCardButtons();
@@ -2480,6 +2489,8 @@
       function bindCardButtons(){
         var adds = document.querySelectorAll("[data-add]");
         for (var i=0;i<adds.length;i++) adds[i].addEventListener("click", function(){ addToCart(this.getAttribute("data-add")); });
+        var quicks = document.querySelectorAll("[data-quick]");
+        for (var k=0;k<quicks.length;k++) quicks[k].addEventListener("click", function(){ quickBuy(this.getAttribute("data-quick")); });
         var dets = document.querySelectorAll("[data-detail]");
         for (var j=0;j<dets.length;j++) dets[j].addEventListener("click", function(){ openDetail(this.getAttribute("data-detail")); });
       }
@@ -2515,6 +2526,12 @@
         if (cart.indexOf(id)===-1){ cart.push(id); toast("Đã thêm “"+byId(id).name+"” vào giỏ"); }
         else if (!silent) toast("Sản phẩm này đã có trong giỏ rồi");
         renderCart();
+      }
+      function quickBuy(id){
+        var p = byId(id); if (!p) return;
+        cart = [id];
+        renderCart();
+        startCheckout();
       }
       function renderCart(){
         $("cartCount").textContent = cart.length;
@@ -2568,6 +2585,7 @@
         closeCart();
         var t = cartTotals();
         var total = t.total, discVal = t.discVal;
+        var hasDigital = cart.some(function(id){ var p = byId(id); return p && p.cat === "san-pham-so"; });
         $("coTitle").textContent = "Thanh toán đơn hàng";
         $("coBody").innerHTML =
             '<div class="pay-box"><h4>Đơn của bạn</h4>'
@@ -2578,11 +2596,31 @@
           + '<div class="field"><label for="coName">Họ tên *</label><input id="coName" required placeholder="VD: Nguyễn Văn A" /></div>'
           + '<div class="field"><label for="coEmail">Gmail nhận sản phẩm *</label><input id="coEmail" type="email" required placeholder="vidu@gmail.com" /><div class="hint">Link trợ lý / skill sẽ gửi vào Gmail này — gõ cho đúng nhé.</div></div>'
           + '<div class="field"><label for="coPhone">Số điện thoại *</label><input id="coPhone" inputmode="tel" required placeholder="09xx xxx xxx" /></div>'
+          + (hasDigital ? '<div class="field"><label>Cách nhận hàng *</label>'
+          + '<label class="radio-row"><input type="radio" name="coDelivery" value="account" checked /> Nhận tài khoản mới — shop giao mail + mật khẩu qua Zalo</label>'
+          + '<label class="radio-row"><input type="radio" name="coDelivery" value="upgrade" /> Nâng cấp tài khoản của tôi</label>'
+          + '<input id="coUpgradeEmail" type="email" placeholder="Email tài khoản cần nâng cấp" style="display:none" />'
+          + '<div class="hint">Chọn “Nâng cấp” thì nhập đúng email tài khoản bạn đang dùng — shop sẽ nâng cấp đúng tài khoản đó.</div></div>' : '')
           + '<button class="btn btn-river" type="submit" style="width:100%;justify-content:center;padding:14px">Tạo mã chuyển khoản — ' + fmt(total) + '</button>'
           + '</form>';
         openModal("checkoutModal");
+        var coRadios = document.querySelectorAll('input[name="coDelivery"]');
+        for (var ri = 0; ri < coRadios.length; ri++) coRadios[ri].addEventListener("change", function(){
+          var up = document.querySelector('input[name="coDelivery"]:checked');
+          var upEmail = $("coUpgradeEmail");
+          if (!upEmail) return;
+          var isUp = up && up.value === "upgrade";
+          upEmail.style.display = isUp ? "" : "none";
+          upEmail.required = isUp;
+        });
         $("coForm").addEventListener("submit", function(ev){
           ev.preventDefault();
+          var delivery = "account", upgradeEmail = "";
+          if (hasDigital){
+            var selDelivery = document.querySelector('input[name="coDelivery"]:checked');
+            delivery = selDelivery ? selDelivery.value : "account";
+            upgradeEmail = delivery === "upgrade" ? $("coUpgradeEmail").value.trim().toLowerCase() : "";
+          }
           currentOrder = {
             code: "DINH" + Date.now().toString().slice(-6),
             name: $("coName").value.trim(),
@@ -2590,6 +2628,8 @@
             phone: $("coPhone").value.trim(),
             items: cart.slice(),
             total: total,
+            delivery: delivery,
+            upgradeEmail: upgradeEmail,
             when: new Date()
           };
           orders.push(currentOrder);
@@ -2598,7 +2638,15 @@
             customer_name: currentOrder.name,
             customer_email: currentOrder.email,
             customer_phone: currentOrder.phone,
-            items: currentOrder.items.map(function(id){ var p = byId(id); return p ? { id: p.id, name: p.name, price: p.price } : { id: id }; }),
+            items: currentOrder.items.map(function(id){
+              var p = byId(id);
+              var it = p ? { id: p.id, name: p.name, price: p.price } : { id: id };
+              if (p && p.cat === "san-pham-so"){
+                it.delivery = currentOrder.delivery;
+                if (currentOrder.delivery === "upgrade") it.upgrade_email = currentOrder.upgradeEmail;
+              }
+              return it;
+            }),
             total: currentOrder.total,
             discount_code: appliedCode || "",
             ref_code: incomingRef || "",
@@ -2919,6 +2967,16 @@
         renderCtvCatalog();
         updateCtvCalc();
       }
+      function populateCtvCats(){
+        var sel = $("ctvCatSel"); if (!sel) return;
+        var cur = sel.value;
+        sel.innerHTML = '<option value="all">Tất cả nhóm (' + products.length + ' sản phẩm)</option>' + CATEGORIES.map(function(c){
+          var n = products.filter(function(p){ return p.cat === c.id; }).length;
+          return n ? '<option value="' + c.id + '">' + esc(c.name) + ' (' + n + ')</option>' : '';
+        }).join("");
+        var ok = cur === "all" || CATEGORIES.some(function(c){ return c.id === cur && products.some(function(p){ return p.cat === cur; }); });
+        if (ok) sel.value = cur; else { sel.value = "all"; ctvState.cat = "all"; }
+      }
       function renderCtvCatalog(){
         var grid = $("ctvGrid"); if (!grid) return;
         var list = products.filter(function(p){
@@ -3106,7 +3164,7 @@
       }
 
       /* ============ Wire up ============ */
-      function renderAll(){ renderChips(); renderProducts(); renderCart(); renderAdmin(); renderPromos(); renderCtvCatalog(); populateCtvCalc(); }
+      function renderAll(){ renderChips(); renderProducts(); renderCart(); renderAdmin(); renderPromos(); populateCtvCats(); renderCtvCatalog(); populateCtvCalc(); }
       function syncSettingsForm(){
         $("sZalo").value = settings.zalo || "";
         $("sBankBin").value = settings.bankBin || "";
@@ -3274,10 +3332,7 @@
         });
 
         // affiliate — danh mục CTV & máy tính hoa hồng
-        $("ctvCatSel").innerHTML = '<option value="all">Tất cả nhóm (' + products.length + ' sản phẩm)</option>' + CATEGORIES.map(function(c){
-          var n = products.filter(function(p){ return p.cat === c.id; }).length;
-          return n ? '<option value="' + c.id + '">' + esc(c.name) + ' (' + n + ')</option>' : '';
-        }).join("");
+        populateCtvCats();
         var ctvRateBtns = document.querySelectorAll("[data-ctv-rate]");
         for (var rb = 0; rb < ctvRateBtns.length; rb++){
           ctvRateBtns[rb].addEventListener("click", function(){
