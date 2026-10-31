@@ -595,6 +595,8 @@
       /* ---------- Admin ---------- */
       #adminSection{display:none}
       #adminSection.show{display:block}
+      #adminSection.admin-locked .admin-lockable{display:none}
+      @media (max-width:620px){ .admin-table.keep4 th:nth-child(4),.admin-table.keep4 td:nth-child(4){display:table-cell} }
       .admin-note{
         background:var(--gold-soft);border:1px solid var(--gold);color:var(--ink);
         border-radius:14px;padding:12px 15px;font-size:14px;margin-bottom:16px;
@@ -804,6 +806,22 @@
       }
       @media (prefers-color-scheme: dark){ .toast{background:var(--gold);color:#3D2A05} }
       .toast.show{transform:translate(-50%,0)}
+      .buyer-toast{
+        position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom, 0px));z-index:65;
+        max-width:min(330px,calc(100vw - 100px));
+        background:var(--surface);border:1px solid var(--line);border-radius:14px;
+        box-shadow:0 10px 28px rgba(15,76,92,.18);padding:11px 13px;
+        display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;
+        opacity:0;transform:translateY(12px);pointer-events:none;
+        transition:opacity .45s ease, transform .45s ease;
+      }
+      .buyer-toast.show{opacity:1;transform:translateY(0)}
+      .buyer-toast .bt-ic{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:var(--leaf-soft);color:var(--leaf);display:flex;align-items:center;justify-content:center}
+      .buyer-toast b{color:var(--river-deep)}
+      @media (prefers-reduced-motion: reduce){
+        .buyer-toast{transition:none}
+        .buyer-toast.show{transform:none}
+      }
       .hidden{display:none !important}
     </style>
   </head>
@@ -1022,10 +1040,10 @@
       <section class="block wrap" id="affiliate">
         <div class="aff-panel">
           <span class="custom-badge">Tiếp thị liên kết — Cộng tác viên</span>
-          <h2>Giới thiệu sản phẩm của shop, <span class="hl">nhận hoa hồng 10–15%</span> mỗi đơn thành công</h2>
+          <h2>Giới thiệu sản phẩm của shop, <span class="hl">nhận hoa hồng 10–13%</span> mỗi đơn thành công</h2>
           <p class="aff-lead">Bạn có bạn bè, học viên hay cộng đồng đang cần trợ lý AI và skill làm nội dung? Đăng ký làm cộng tác viên, nhận mã giới thiệu riêng, chia sẻ cho người cần — có đơn đã thanh toán là hoa hồng tự ghi nhận vào bảng theo dõi của bạn. Không cần ôm hàng, không cần vốn, shop lo giao hàng và hỗ trợ khách.</p>
           <div class="aff-stats">
-            <div class="aff-stat"><b>10–15%</b><span>Hoa hồng theo số đơn trong tháng</span></div>
+            <div class="aff-stat"><b>10–13%</b><span>Hoa hồng theo số đơn trong tháng</span></div>
             <div class="aff-stat"><b>30 ngày</b><span>Thời gian ghi nhận (cookie) — ai bấm link sau cùng thì tính cho người đó</span></div>
             <div class="aff-stat"><b>7 ngày</b><span>Giữ hoa hồng sau khi khách thanh toán, phòng đơn hoàn tiền</span></div>
             <div class="aff-stat"><b>200.000đ</b><span>Mức tối thiểu để rút — chốt sổ và trả vào ngày 5 hàng tháng</span></div>
@@ -1048,7 +1066,7 @@
             <p>Từ 10–29 đơn thành công trong tháng. Mức mà đa số cộng tác viên bán đều tay sẽ đạt.</p>
           </div>
           <div class="aff-tier">
-            <div class="pct">15%</div>
+            <div class="pct">13%</div>
             <h3>Mức đối tác</h3>
             <p>Từ 30 đơn thành công trong tháng trở lên, kèm hỗ trợ nội dung mẫu để bạn chia sẻ dễ hơn.</p>
           </div>
@@ -1080,7 +1098,7 @@
               <div class="ctv-seg" role="group" aria-label="Chọn mức hoa hồng">
                 <button type="button" data-ctv-rate="10" class="on">10%<small>1–9 đơn / tháng</small></button>
                 <button type="button" data-ctv-rate="12">12%<small>10–29 đơn / tháng</small></button>
-                <button type="button" data-ctv-rate="15">15%<small>Từ 30 đơn / tháng</small></button>
+                <button type="button" data-ctv-rate="13">13%<small>Từ 30 đơn / tháng</small></button>
               </div>
               <div class="ctv-orders-row">
                 <input id="ctvOrdersInput" type="number" min="0" step="1" inputmode="numeric" placeholder="Hoặc nhập số đơn dự kiến: VD 12" aria-label="Số đơn dự kiến trong tháng" />
@@ -1226,7 +1244,7 @@
         <!-- ĐIỀU KHOẢN -->
         <h3 style="margin:26px 0 12px;font-size:20px">Điều khoản cộng tác viên</h3>
         <div class="aff-terms">
-          <div class="term"><span class="tn">1</span><span><b>Cách tính hoa hồng:</b> hoa hồng tính trên số tiền khách đã chuyển khoản thành công cho đơn mua qua link/mã của bạn, theo mức 10% / 12% / 15% tùy tổng số đơn thành công trong tháng đó.</span></div>
+          <div class="term"><span class="tn">1</span><span><b>Cách tính hoa hồng:</b> hoa hồng tính trên số tiền khách đã chuyển khoản thành công cho đơn mua qua link/mã của bạn, theo mức 10% / 12% / 13% tùy tổng số đơn thành công trong tháng đó.</span></div>
           <div class="term"><span class="tn">2</span><span><b>Ghi nhận 30 ngày, người cuối được tính:</b> khách bấm link của bạn thì trong 30 ngày, đơn mua được ghi cho bạn — trừ khi sau đó khách bấm link của cộng tác viên khác (tính cho người bấm sau cùng). Một đơn chỉ trả hoa hồng cho một người.</span></div>
           <div class="term"><span class="tn">3</span><span><b>Giữ 7 ngày rồi mới trả:</b> hoa hồng chỉ được tính khi shop đã nhận được tiền. Sau khi đơn thành công, hoa hồng được giữ 7 ngày để phòng trường hợp hoàn tiền; đơn bị hoàn tiền thì hoa hồng của đơn đó bị hủy.</span></div>
           <div class="term"><span class="tn">4</span><span><b>Thanh toán ngày 5 hàng tháng:</b> shop chốt sổ cuối tháng và chuyển khoản hoa hồng vào ngày 5 tháng sau, khi tổng hoa hồng sẵn sàng trả đạt tối thiểu 200.000đ. Chưa đủ thì dồn sang tháng kế tiếp.</span></div>
@@ -1270,7 +1288,7 @@
           </details>
           <details class="faq-item">
             <summary>Tôi muốn giới thiệu sản phẩm để nhận hoa hồng thì làm sao? <span class="arr">+</span></summary>
-            <p>Bạn đăng ký ở mục <a href="#affiliate">Cộng tác viên</a> trên trang này: điền họ tên, Zalo, Gmail và tài khoản ngân hàng nhận hoa hồng. Shop duyệt xong sẽ cấp mã giới thiệu riêng (dạng DINH01); bạn chia sẻ link sản phẩm kèm mã đó, có đơn đã thanh toán là nhận hoa hồng 10–15%, chốt sổ và trả vào ngày 5 hàng tháng. Sau khi đăng ký, bạn đăng nhập lại ngay trong mục Cộng tác viên bằng đúng Gmail và số điện thoại đã đăng ký để xem thu nhập của riêng mình: số đơn, hoa hồng đang giữ, sẵn sàng trả và đã trả. Chi tiết mức hoa hồng và điều khoản nằm ngay trong mục Cộng tác viên.</p>
+            <p>Bạn đăng ký ở mục <a href="#affiliate">Cộng tác viên</a> trên trang này: điền họ tên, Zalo, Gmail và tài khoản ngân hàng nhận hoa hồng. Shop duyệt xong sẽ cấp mã giới thiệu riêng (dạng DINH01); bạn chia sẻ link sản phẩm kèm mã đó, có đơn đã thanh toán là nhận hoa hồng 10–13%, chốt sổ và trả vào ngày 5 hàng tháng. Sau khi đăng ký, bạn đăng nhập lại ngay trong mục Cộng tác viên bằng đúng Gmail và số điện thoại đã đăng ký để xem thu nhập của riêng mình: số đơn, hoa hồng đang giữ, sẵn sàng trả và đã trả. Chi tiết mức hoa hồng và điều khoản nằm ngay trong mục Cộng tác viên.</p>
           </details>
           <details class="faq-item">
             <summary>Mua rồi có được hỗ trợ khi trợ lý thay đổi không? <span class="arr">+</span></summary>
@@ -1287,8 +1305,25 @@
             <p>Thêm sản phẩm mới, đổi ảnh bìa, dán link trợ lý, tạo mã giảm giá — khách mua xong là nhận link trong Kho của tôi.</p>
           </div>
         </div>
-        <div class="admin-note">Bản phác thảo giao diện: mọi thay đổi ở đây áp dụng ngay trên trang để bạn xem thử, nhưng chưa lưu lên máy chủ. Khi làm bản chính thức, khu vực này sẽ nối cơ sở dữ liệu (như trang quản trị của CongDinhShop) để lưu vĩnh viễn, và link sẽ tự gửi về Gmail khách ngay khi thanh toán được xác nhận.</div>
-        <div class="row-between" style="margin-bottom:12px">
+        <div class="settings-card" id="adminLoginBox" style="margin-top:0">
+          <h3>Đăng nhập quản trị</h3>
+          <p class="sub">Chỉ chủ shop đăng nhập được vào khu vực này. Mật khẩu quản trị do chủ shop đặt trong phần biến môi trường của Vercel (không lưu trong mã trang).</p>
+          <div class="form-grid" id="adminPassRow">
+            <div class="field">
+              <label for="adminPass">Mật khẩu quản trị</label>
+              <input id="adminPass" type="password" placeholder="Nhập mật khẩu quản trị" autocomplete="current-password" />
+            </div>
+          </div>
+          <div class="disc-msg hidden" id="adminLoginMsg" role="status"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-river" id="adminLoginBtn" type="button">Đăng nhập</button>
+            <button class="btn" id="adminPreviewBtn" type="button" style="display:none">Vào chế độ xem thử</button>
+            <button class="btn" id="adminLogoutBtn" type="button" style="display:none">Đăng xuất</button>
+          </div>
+          <p class="hint" id="adminLoginHint" style="margin-top:10px"></p>
+        </div>
+        <div class="admin-note admin-lockable" id="adminNote">Đăng nhập quản trị để sửa sản phẩm, mã giảm giá và cài đặt — thay đổi lưu thẳng lên cơ sở dữ liệu, khách thấy ngay. Đơn hàng và cộng tác viên quản lý ở phía dưới.</div>
+        <div class="row-between admin-lockable" style="margin-bottom:12px">
           <b id="adminCount"></b>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="mini-btn" id="exportBtn" type="button">Xuất danh mục (JSON)</button>
@@ -1297,7 +1332,7 @@
             <button class="btn btn-river" id="addProductBtn" type="button" style="padding:8px 14px">+ Thêm sản phẩm</button>
           </div>
         </div>
-        <div style="overflow-x:auto">
+        <div class="admin-lockable" style="overflow-x:auto">
           <table class="admin-table">
             <thead>
               <tr><th>Ảnh</th><th>Sản phẩm</th><th>Nhóm</th><th>Giá bán</th><th>Link trợ lý</th><th></th></tr>
@@ -1306,7 +1341,7 @@
           </table>
         </div>
 
-        <form class="admin-form hidden" id="productForm">
+        <form class="admin-form hidden admin-lockable" id="productForm">
           <h3 id="formTitle">Thêm sản phẩm</h3>
           <input type="hidden" id="fId" />
           <div class="form-grid">
@@ -1363,7 +1398,7 @@
           </div>
         </form>
 
-        <div class="settings-card" id="promoCard">
+        <div class="settings-card admin-lockable" id="promoCard">
           <h3>Mã giảm giá &amp; khuyến mãi</h3>
           <p class="sub">Tạo mã giảm giá cho khách nhập ở giỏ hàng: giảm theo <b>%</b> hoặc giảm <b>số tiền cố định</b>, có thể đặt ngày hết hạn và bật/tắt từng mã. Khách bấm “Áp dụng” là tổng tiền tự trừ đúng số đã giảm — mã QR thanh toán cũng sinh theo số tiền sau giảm.</p>
           <div class="row-between" style="margin-bottom:12px">
@@ -1416,7 +1451,7 @@
           </form>
         </div>
 
-        <div class="settings-card">
+        <div class="settings-card admin-lockable">
           <h3>Cài đặt thanh toán &amp; liên hệ</h3>
           <p class="sub">Thông tin này hiện ở bước thanh toán và các nút Zalo trên trang. Chỉ cần nhập đúng <b>ngân hàng + số tài khoản</b>: mã QR ở bước thanh toán sẽ <b>tự sinh theo từng đơn</b> — khách quét QR là app ngân hàng tự điền đúng số tiền của đơn và nội dung là mã đơn, không phải gõ tay.</p>
           <div class="form-grid">
@@ -1448,6 +1483,40 @@
           </div>
           <button class="btn btn-river" id="settingsSave" type="button">Lưu cài đặt</button>
         </div>
+        <div class="settings-card admin-lockable" id="ordersCard">
+          <h3>Quản lý đơn hàng</h3>
+          <p class="sub">Giao hàng bằng tay qua Zalo (không giao tự động): khách chuyển khoản xong, đơn lưu ở trạng thái chờ xác nhận. Chủ shop tự nhắn Zalo cho khách để giao link trợ lý / tài khoản bằng tay, rồi bấm “Đã giao qua Zalo” — khi đó link mới hiện trong Kho của tôi của khách và đơn tính là hoàn tất. (Gửi link tự động về Gmail làm sau.)</p>
+          <div class="row-between" style="margin-bottom:12px">
+            <b id="ordersCount">Chưa tải đơn hàng</b>
+            <button class="btn btn-river" id="ordersReloadBtn" type="button" style="padding:8px 14px">Tải lại</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table keep4">
+              <thead>
+                <tr><th>Mã đơn</th><th>Khách</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Trạng thái</th><th></th></tr>
+              </thead>
+              <tbody id="ordersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="settings-card admin-lockable" id="affiliatesCard">
+          <h3>Quản lý cộng tác viên</h3>
+          <p class="sub">Duyệt cộng tác viên mới đăng ký và xem đơn + hoa hồng của từng người. Hoa hồng 10% (1–9 đơn), 12% (10–29 đơn), 13% (từ 30 đơn).</p>
+          <div class="row-between" style="margin-bottom:12px">
+            <b id="affiliatesCount">Chưa tải cộng tác viên</b>
+            <button class="btn btn-river" id="affiliatesReloadBtn" type="button" style="padding:8px 14px">Tải lại</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table keep4">
+              <thead>
+                <tr><th>Mã CTV</th><th>Họ tên</th><th>Liên hệ</th><th>Trạng thái</th><th>Đơn / Hoa hồng</th><th></th></tr>
+              </thead>
+              <tbody id="affiliatesTableBody"></tbody>
+            </table>
+          </div>
+          <div id="affDetailBox" style="margin-top:14px"></div>
+        </div>
       </section>
     </main>
 
@@ -1467,7 +1536,7 @@
             <ul>
               <li><a href="#faq">Câu hỏi thường gặp</a></li>
               <li><a href="#lam-theo-yeu-cau">Nhận làm phần mềm &amp; trợ lý AI theo yêu cầu</a></li>
-              <li><a href="#affiliate">Cộng tác viên — nhận hoa hồng 10–15%</a></li>
+              <li><a href="#affiliate">Cộng tác viên — nhận hoa hồng 10–13%</a></li>
               <li><a href="#" id="footVault">Kho của tôi — nhận lại link đã mua</a></li>
               <li><a href="#" data-zalo>Nhắn Zalo tư vấn</a></li>
             </ul>
@@ -1612,6 +1681,7 @@
     </div>
 
     <div class="toast" id="toast" role="status"></div>
+    <div class="buyer-toast" id="buyerToast" role="status" aria-live="polite"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script>
@@ -1633,11 +1703,12 @@
       };
       var CATEGORIES = [
         { id:"tro-ly-gpt",   name:"Trợ lý GPT",      icon:"bot",      color:"linear-gradient(135deg,#14635D,#0F4C5C)", soft:"var(--river-soft)", ink:"var(--river)" },
-        { id:"skill-kich-ban", name:"Skill viết kịch bản", icon:"pen", color:"linear-gradient(135deg,#E07B39,#C2541B)", soft:"var(--sunset-soft)", ink:"var(--sunset)" },
-        { id:"skill-tao-anh",  name:"Skill tạo ảnh", icon:"image",   color:"linear-gradient(135deg,#D95D8F,#B23A6E)", soft:"var(--lotus-soft)", ink:"var(--lotus)" },
+        { id:"skill",        name:"Skill",            icon:"pen",      color:"linear-gradient(135deg,#E07B39,#C2541B)", soft:"var(--sunset-soft)", ink:"var(--sunset)" },
         { id:"workflow-video", name:"Workflow làm video", icon:"video", color:"linear-gradient(135deg,#8A5A3B,#5F3D24)", soft:"var(--silt-soft)", ink:"var(--silt)" },
         { id:"ma-lenh",      name:"Mã lệnh (Prompt)", icon:"terminal", color:"linear-gradient(135deg,#5E8C3F,#3F6527)", soft:"var(--leaf-soft)", ink:"var(--leaf)" },
-        { id:"sub-agent",    name:"Sub Agent",      icon:"agent",    color:"linear-gradient(135deg,#C77F1A,#9A5F0B)", soft:"var(--gold-soft)", ink:"var(--gold-deep)" }
+        { id:"sub-agent",    name:"Sub Agent",      icon:"agent",    color:"linear-gradient(135deg,#C77F1A,#9A5F0B)", soft:"var(--gold-soft)", ink:"var(--gold-deep)" },
+        { id:"web-app",      name:"WEB APP",        icon:"terminal", color:"linear-gradient(135deg,#3E6FB0,#2B4E80)", soft:"var(--river-soft)", ink:"var(--river)" },
+        { id:"san-pham-so",  name:"Sản phẩm số",    icon:"chat",     color:"linear-gradient(135deg,#D95D8F,#B23A6E)", soft:"var(--lotus-soft)", ink:"var(--lotus)" }
       ];
       function catOf(id){
         for (var i=0;i<CATEGORIES.length;i++) if (CATEGORIES[i].id===id) return CATEGORIES[i];
@@ -1652,10 +1723,10 @@
         { id:"sp2", name:"Trợ Lý GPT Chăm Sóc Khách Hàng", cat:"tro-ly-gpt", price:249000, oldPrice:499000, hot:false, link:"",
           desc:"Trợ lý trả lời tin nhắn khách: hỏi giá, hỏi ship, đổi trả, khiếu nại — giọng thân thiện, lịch sự, đúng kiểu nói chuyện với bà con.",
           includes:["Link trợ lý GPT dùng ngay trên ChatGPT","50 mẫu trả lời tình huống khó: khách chê đắt, khách bom hàng…","Hướng dẫn nạp thông tin shop của bạn vào trợ lý","Hỗ trợ qua Zalo khi cài đặt"] },
-        { id:"sp3", name:"Skill Viết Kịch Bản Video Ngắn", cat:"skill-kich-ban", price:199000, oldPrice:399000, hot:true, link:"",
+        { id:"sp3", name:"Skill Viết Kịch Bản Video Ngắn", cat:"skill", price:199000, oldPrice:399000, hot:true, link:"",
           desc:"Skill biến 1 ý tưởng thành kịch bản TikTok / Reels / Shorts hoàn chỉnh: câu mở đầu giữ chân người xem, nội dung, lời kêu gọi — trong vài phút.",
           includes:["File skill + hướng dẫn cài vào trợ lý AI của bạn","20 khung kịch bản theo ngành: ăn uống, nông sản, thời trang…","Ví dụ kịch bản mẫu đã quay thực tế","Cập nhật miễn phí khi skill có bản mới"] },
-        { id:"sp4", name:"Skill Tạo Ảnh Sản Phẩm Bán Hàng", cat:"skill-tao-anh", price:149000, oldPrice:299000, hot:false, link:"",
+        { id:"sp4", name:"Skill Tạo Ảnh Sản Phẩm Bán Hàng", cat:"skill", price:149000, oldPrice:299000, hot:false, link:"",
           desc:"Skill ra câu lệnh tạo ảnh sản phẩm đẹp như chụp studio: đổi nền, thêm ánh sáng hoàng hôn, chèn bối cảnh sông nước — không cần biết thiết kế.",
           includes:["File skill + 30 câu lệnh tạo ảnh theo nhóm hàng","Hướng dẫn dùng với công cụ tạo ảnh miễn phí","Mẹo xử lý ảnh sản phẩm chụp bằng điện thoại","Hỗ trợ qua Zalo khi cài đặt"] },
         { id:"sp5", name:"Workflow Làm Video AI Từ A–Z", cat:"workflow-video", price:299000, oldPrice:599000, hot:true, link:"",
@@ -1717,19 +1788,397 @@
       var affiliates = [];      // cộng tác viên đăng ký trong phiên xem này
       var currentAff = null;    // tài khoản CTV đang đăng nhập trong phiên xem này
       var AFF_SAMPLE_ORDERS = [ // đơn ví dụ minh họa trong bảng theo dõi mẫu
-        { code:"DINH904213", product:"Skill Viết Kịch Bản Video Ngắn", total:199000, rate:12, status:"hold", when:"Hôm nay" },
+        { code:"DINH904213", product:"Skill Viết Kịch Bản Video Ngắn", total:199000, rate:13, status:"hold", when:"Hôm nay" },
         { code:"DINH903877", product:"Bộ Mã Lệnh Viết Bài & Lên Kế Hoạch", total:99000, rate:12, status:"hold", when:"Hôm qua" },
         { code:"DINH902560", product:"Trợ Lý GPT Viết Content Bán Hàng", total:249000, rate:12, status:"ready", when:"Tuần trước" },
         { code:"DINH901104", product:"Skill Tạo Ảnh Sản Phẩm Bán Hàng", total:149000, rate:10, status:"paid", when:"Tháng trước" }
       ];
       var AFF_SAMPLE_ACCOUNT = { // tài khoản mẫu minh họa khi chưa đăng nhập
         sample: true, code: "DINH01", name: "Cộng tác viên mẫu", email: "", phone: "", status: "sample",
-        stats: { clicks: 128, orders: 6, hold: 35760, ready: 29880, paid: 14900 },
+        stats: { clicks: 128, orders: 6, hold: 37750, ready: 29880, paid: 14900 },
         orders: AFF_SAMPLE_ORDERS
       };
       var activeCat = "all";
       var editingImg = "";      // dataURL ảnh đang sửa trong form
       var ctvState = { rate: 10, cat: "all", q: "" };  // danh mục CTV: mức % đang xem, nhóm, từ khóa
+
+      /* ============ Supabase — cơ sở dữ liệu thật (bản thật, không demo) ============ */
+      var SUPABASE_URL = "https://qjioimowabbwipousizm.supabase.co";
+      var SUPABASE_KEY = "sb_publishable_wQespwIvflsSKXBTVxlIXA_Fr6QIh52"; // khóa công khai (publishable) — web dùng để đọc danh mục, ai xem mã trang cũng thấy được
+      var sbReady = false;       // true khi đã tải xong danh mục từ Supabase
+      var adminToken = null;     // token đăng nhập quản trị (lưu trong sessionStorage)
+      var adminAuthed = false;   // true khi đã đăng nhập quản trị (hoặc đang ở chế độ xem thử)
+      var adminPreviewMode = false; // true khi API quản trị chưa cấu hình — chỉ xem thử, chưa lưu thật
+      var incomingRef = "";      // mã giới thiệu ?ref= trong link khách bấm vào
+      var adminOrders = [];      // đơn hàng tải từ máy chủ (chỉ quản trị thấy)
+      var adminAffiliates = [];  // cộng tác viên tải từ máy chủ
+      var adminAffOrders = [];   // đơn của cộng tác viên (tính hoa hồng)
+      var affDetailCode = "";    // mã CTV đang mở bảng chi tiết đơn trong quản trị
+
+      function sbHeaders(json){
+        var h = { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY };
+        if (json) h["Content-Type"] = "application/json";
+        return h;
+      }
+      function sbGet(table, query){
+        return fetch(SUPABASE_URL + "/rest/v1/" + table + (query || ""), { headers: sbHeaders(false) })
+          .then(function(r){ if (!r.ok) throw new Error("Supabase " + r.status); return r.json(); });
+      }
+      function sbInsert(table, row){
+        return fetch(SUPABASE_URL + "/rest/v1/" + table, {
+          method: "POST", headers: sbHeaders(true), body: JSON.stringify(row)
+        }).then(function(r){ if (!r.ok) throw new Error("Supabase " + r.status); return r.json(); });
+      }
+      function mapProduct(row){
+        // 2 nhóm skill cũ (skill-kich-ban, skill-tao-anh) đã gộp thành 1 nhóm "skill":
+        // map ở đây để sản phẩm cũ trong DB hiển thị/lọc đúng ngay cả khi chưa chạy SQL đổi cat.
+        var cat = row.cat;
+        if (cat === "skill-kich-ban" || cat === "skill-tao-anh") cat = "skill";
+        return { id: row.id, name: row.name, cat: cat, price: row.price, oldPrice: row.old_price || 0,
+          hot: !!row.hot, link: row.link || "", desc: row.description || "",
+          includes: Array.isArray(row.includes) ? row.includes : [], img: row.img || "" };
+      }
+      function mapPromo(row){
+        return { id: row.id, code: row.code, type: row.type, value: row.value,
+          expiry: row.expiry || "", active: !!row.active };
+      }
+      function loadFromSupabase(){
+        return Promise.all([
+          sbGet("products", "?select=*&order=id"),
+          sbGet("promos", "?select=*&order=id"),
+          sbGet("settings", "?select=*")
+        ]).then(function(res){
+          if (Array.isArray(res[0]) && res[0].length) products = res[0].map(mapProduct);
+          if (Array.isArray(res[1]) && res[1].length) promos = res[1].map(mapPromo);
+          if (Array.isArray(res[2])) res[2].forEach(function(row){
+            if (row.key === "zalo") settings.zalo = row.value || "";
+            if (row.key === "bank") settings.bank = row.value || "";
+            if (row.key === "bank_bin") settings.bankBin = row.value || "";
+            if (row.key === "bank_account") settings.bankAccount = row.value || "";
+            if (row.key === "bank_holder") settings.bankHolder = row.value || "";
+            if (row.key === "qr_img") settings.qrImg = row.value || "";
+          });
+          sbReady = true;
+          syncSettingsForm();
+          renderAll();
+        }).catch(function(){ sbReady = false; });
+      }
+
+      /* ---- API quản trị (máy chủ Vercel — cần biến môi trường, chủ shop tự nhập trên Vercel) ---- */
+      function apiCall(url, body, token){
+        var headers = { "Content-Type": "application/json" };
+        if (token) headers["Authorization"] = "Bearer " + token;
+        return fetch(url, { method: "POST", headers: headers, body: JSON.stringify(body) })
+          .then(function(r){
+            return r.text().then(function(t){
+              var d = {};
+              try { d = t ? JSON.parse(t) : {}; } catch (e) { d = {}; }
+              if (!r.ok){
+                var err = new Error((d && d.error) || ("Lỗi " + r.status));
+                err.code = (d && d.error) || ("http-" + r.status);
+                throw err;
+              }
+              return d;
+            });
+          });
+      }
+      function adminApi(action, payload){
+        var body = payload || {};
+        body.action = action;
+        return apiCall("/api/admin", body, adminToken);
+      }
+      function adminLoginRequest(password){
+        return apiCall("/api/admin-login", { password: password });
+      }
+      function setAdminLocked(locked){
+        var s = $("adminSection");
+        if (s) s.classList.toggle("admin-locked", locked);
+      }
+      function renderAdminAuth(){
+        var box = $("adminLoginBox"); if (!box) return;
+        var msg = $("adminLoginMsg"), hint = $("adminLoginHint");
+        var passRow = $("adminPassRow"), loginBtn = $("adminLoginBtn"),
+            logoutBtn = $("adminLogoutBtn"), previewBtn = $("adminPreviewBtn");
+        if (msg) msg.classList.add("hidden");
+        var note = $("adminNote");
+        if (adminAuthed && !adminPreviewMode){
+          if (passRow) passRow.style.display = "none";
+          if (loginBtn) loginBtn.style.display = "none";
+          if (previewBtn) previewBtn.style.display = "none";
+          if (logoutBtn) logoutBtn.style.display = "";
+          if (hint) hint.textContent = "Đã đăng nhập quản trị — thay đổi ở đây lưu thẳng lên cơ sở dữ liệu.";
+          if (note) note.textContent = "Đã nối cơ sở dữ liệu: thay đổi ở đây lưu thẳng lên máy chủ — khách thấy ngay. Đơn hàng và cộng tác viên quản lý ở phía dưới.";
+        } else if (adminAuthed && adminPreviewMode){
+          if (passRow) passRow.style.display = "none";
+          if (loginBtn) loginBtn.style.display = "none";
+          if (previewBtn) previewBtn.style.display = "none";
+          if (logoutBtn) logoutBtn.style.display = "";
+          if (hint) hint.textContent = "Đang ở chế độ xem thử — thay đổi chỉ lưu trong phiên xem này, tải lại trang là mất. Muốn lưu thật thì nhập biến môi trường trên Vercel rồi đăng nhập lại.";
+          if (note) note.textContent = "Chưa cấu hình đăng nhập máy chủ (cần nhập biến môi trường trên Vercel): khu vực này đang ở chế độ xem thử — thay đổi chỉ lưu trong phiên xem này, tải lại trang là mất.";
+        } else {
+          if (passRow) passRow.style.display = "";
+          if (loginBtn) loginBtn.style.display = "";
+          if (logoutBtn) logoutBtn.style.display = "none";
+          if (previewBtn) previewBtn.style.display = "none";
+          if (hint) hint.textContent = "";
+        }
+      }
+      function doAdminLogin(){
+        var pw = $("adminPass").value;
+        var msg = $("adminLoginMsg");
+        if (!pw){
+          if (msg){ msg.textContent = "Bạn nhập mật khẩu quản trị nhé"; msg.className = "disc-msg err"; msg.classList.remove("hidden"); }
+          return;
+        }
+        adminLoginRequest(pw).then(function(d){
+          adminToken = d.token;
+          try { sessionStorage.setItem("dinhAdminToken", d.token); } catch (e) {}
+          adminAuthed = true; adminPreviewMode = false;
+          setAdminLocked(false); renderAdminAuth(); loadAdminData();
+          toast("Đã đăng nhập quản trị");
+        }).catch(function(err){
+          var notCfg = err && (err.code === "not-configured" || (err.code && String(err.code).indexOf("http-") === 0));
+          if (notCfg){
+            if (msg){ msg.textContent = "Máy chủ chưa cấu hình đăng nhập quản trị (thiếu biến môi trường trên Vercel). Bạn có thể vào chế độ xem thử trước."; msg.className = "disc-msg err"; msg.classList.remove("hidden"); }
+            var pb = $("adminPreviewBtn"); if (pb) pb.style.display = "";
+          } else {
+            if (msg){ msg.textContent = "Sai mật khẩu quản trị — kiểm tra lại nhé"; msg.className = "disc-msg err"; msg.classList.remove("hidden"); }
+          }
+        });
+      }
+      function enterAdminPreview(){
+        adminAuthed = true; adminPreviewMode = true; adminToken = null;
+        setAdminLocked(false); renderAdminAuth();
+        toast("Đang ở chế độ xem thử — thay đổi chưa lưu lên máy chủ");
+      }
+      function adminLogout(){
+        adminToken = null; adminAuthed = false; adminPreviewMode = false;
+        try { sessionStorage.removeItem("dinhAdminToken"); } catch (e) {}
+        setAdminLocked(true); renderAdminAuth();
+        var pw = $("adminPass"); if (pw) pw.value = "";
+      }
+      function checkAdminSession(){
+        setAdminLocked(true); renderAdminAuth();
+        var saved = null;
+        try { saved = sessionStorage.getItem("dinhAdminToken"); } catch (e) {}
+        if (!saved) return;
+        adminToken = saved;
+        adminApi("ping").then(function(){
+          adminAuthed = true; adminPreviewMode = false;
+          setAdminLocked(false); renderAdminAuth(); loadAdminData();
+        }).catch(function(){
+          adminToken = null;
+          try { sessionStorage.removeItem("dinhAdminToken"); } catch (e) {}
+        });
+      }
+      function loadAdminData(){ loadAdminOrders(); loadAdminAffiliates(); }
+      function orderStatusLabel(st){
+        return st === "paid" ? "Đã nhận tiền" : st === "delivered" ? "Đã giao qua Zalo" : st === "cancelled" ? "Đã hủy" : "Chờ xác nhận";
+      }
+      function renderAdminOrders(){
+        var body = $("ordersTableBody"); if (!body) return;
+        $("ordersCount").textContent = "Tổng số: " + adminOrders.length + " đơn";
+        if (!adminOrders.length){ body.innerHTML = '<tr><td colspan="6" style="color:var(--muted)">Chưa có đơn hàng nào.</td></tr>'; return; }
+        body.innerHTML = adminOrders.map(function(o){
+          var items = Array.isArray(o.items) ? o.items.map(function(it){ return (it && typeof it === "object") ? (it.name || it.id) : String(it); }).join("; ") : "";
+          var btns = "";
+          if (o.status !== "delivered" && o.status !== "cancelled"){
+            var digits = String(o.customer_phone || "").replace(/\D/g, "");
+            if (digits) btns += '<a class="mini-btn" href="https://zalo.me/' + esc(digits) + '" target="_blank" rel="noopener">Nhắn Zalo cho khách</a> ';
+            btns += '<button class="mini-btn" type="button" data-order-delivered="' + esc(o.code) + '">Đã giao qua Zalo</button>';
+          }
+          return '<tr><td><b>' + esc(o.code) + '</b></td>'
+            + '<td>' + esc(o.customer_name || "") + '<br /><span style="color:var(--muted);font-size:13px">' + esc(o.customer_email || "") + ' · ' + esc(o.customer_phone || "") + '</span></td>'
+            + '<td style="font-size:13px">' + esc(items) + '</td>'
+            + '<td><b>' + fmt(o.total || 0) + '</b>' + (o.discount_code ? '<br /><span style="color:var(--muted);font-size:13px">Mã: ' + esc(o.discount_code) + '</span>' : '') + '</td>'
+            + '<td>' + esc(orderStatusLabel(o.status)) + '</td>'
+            + '<td style="white-space:nowrap">' + btns + '</td></tr>';
+        }).join("");
+        var dones = document.querySelectorAll("[data-order-delivered]");
+        for (var j = 0; j < dones.length; j++) dones[j].addEventListener("click", function(){ setOrderStatus(this.getAttribute("data-order-delivered"), "delivered"); });
+      }
+      function setOrderStatus(code, status){
+        adminApi("update-order", { code: code, status: status }).then(function(){
+          for (var i = 0; i < adminOrders.length; i++) if (adminOrders[i].code === code) adminOrders[i].status = status;
+          renderAdminOrders(); loadAdminAffiliates();
+          toast("Đã đánh dấu giao qua Zalo đơn " + code);
+        }).catch(function(){ toast("Chưa cập nhật được đơn — thử lại nhé"); });
+      }
+      function loadAdminOrders(){
+        adminApi("list-orders").then(function(d){ adminOrders = d.orders || []; renderAdminOrders(); }).catch(function(){});
+      }
+      function affStatusLabel(st){
+        return st === "active" ? "Đã duyệt" : st === "rejected" ? "Từ chối" : "Chờ duyệt";
+      }
+      function renderAdminAffiliates(){
+        var body = $("affiliatesTableBody"); if (!body) return;
+        $("affiliatesCount").textContent = "Tổng số: " + adminAffiliates.length + " cộng tác viên";
+        if (!adminAffiliates.length){ body.innerHTML = '<tr><td colspan="6" style="color:var(--muted)">Chưa có cộng tác viên nào đăng ký.</td></tr>'; return; }
+        body.innerHTML = adminAffiliates.map(function(a){
+          var list = adminAffOrders.filter(function(o){ return o.aff_code === a.code; });
+          var comm = list.reduce(function(s, o){ return s + (o.commission || 0); }, 0);
+          var btns = '<button class="mini-btn" type="button" data-aff-view="' + esc(a.code) + '">Xem đơn</button>';
+          if (a.status === "pending") btns += ' <button class="mini-btn" type="button" data-aff-ok="' + esc(a.code) + '">Duyệt</button>';
+          return '<tr><td><b>' + esc(a.code) + '</b></td>'
+            + '<td>' + esc(a.name || "") + '</td>'
+            + '<td style="font-size:13px">' + esc(a.email || "") + '<br /><span style="color:var(--muted)">' + esc(a.phone || "") + '</span></td>'
+            + '<td>' + esc(affStatusLabel(a.status)) + '</td>'
+            + '<td>' + list.length + ' đơn<br /><b>' + fmt(comm) + '</b></td>'
+            + '<td style="white-space:nowrap">' + btns + '</td></tr>';
+        }).join("");
+        var views = document.querySelectorAll("[data-aff-view]");
+        for (var i = 0; i < views.length; i++) views[i].addEventListener("click", function(){ showAffDetail(this.getAttribute("data-aff-view")); });
+        var oks = document.querySelectorAll("[data-aff-ok]");
+        for (var j = 0; j < oks.length; j++) oks[j].addEventListener("click", function(){ setAffiliateStatus(this.getAttribute("data-aff-ok"), "active"); });
+      }
+      function setAffiliateStatus(code, status){
+        adminApi("update-affiliate", { code: code, status: status }).then(function(){
+          for (var i = 0; i < adminAffiliates.length; i++) if (adminAffiliates[i].code === code) adminAffiliates[i].status = status;
+          renderAdminAffiliates();
+          toast("Đã duyệt cộng tác viên " + code);
+        }).catch(function(){ toast("Chưa cập nhật được — thử lại nhé"); });
+      }
+      function showAffDetail(code){
+        affDetailCode = code;
+        var aff = null;
+        for (var i = 0; i < adminAffiliates.length; i++) if (adminAffiliates[i].code === code) aff = adminAffiliates[i];
+        var box = $("affDetailBox"); if (!box) return;
+        if (!aff){ box.innerHTML = ""; return; }
+        var list = adminAffOrders.filter(function(o){ return o.aff_code === code; });
+        var comm = list.reduce(function(s, o){ return s + (o.commission || 0); }, 0);
+        var html = '<h4 style="margin:0 0 8px">Đơn của ' + esc(aff.name) + ' (' + esc(code) + ') — tổng hoa hồng: ' + fmt(comm) + '</h4>';
+        if (!list.length){ html += '<p style="color:var(--muted)">Chưa có đơn nào qua link của cộng tác viên này.</p>'; }
+        else {
+          html += '<div style="overflow-x:auto"><table class="admin-table"><thead><tr><th>Mã đơn</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Tỉ lệ</th><th>Hoa hồng</th><th>Trạng thái</th><th></th></tr></thead><tbody>'
+            + list.map(function(o){
+                var b = "";
+                if (o.status === "hold") b = '<button class="mini-btn" type="button" data-afford-ready="' + o.id + '">Sẵn sàng trả</button>';
+                else if (o.status === "ready") b = '<button class="mini-btn" type="button" data-afford-paid="' + o.id + '">Đã trả</button>';
+                return '<tr><td><b>' + esc(o.order_code) + '</b></td><td style="font-size:13px">' + esc(o.product_name || "") + '</td><td>' + fmt(o.total || 0) + '</td><td>' + (o.rate || 0) + '%</td><td><b>' + fmt(o.commission || 0) + '</b></td><td>' + esc(o.status === "paid" ? "Đã trả" : o.status === "ready" ? "Sẵn sàng trả" : "Đang giữ") + '</td><td style="white-space:nowrap">' + b + '</td></tr>';
+              }).join("")
+            + '</tbody></table></div>';
+        }
+        box.innerHTML = html;
+        var r1 = document.querySelectorAll("[data-afford-ready]");
+        for (var a = 0; a < r1.length; a++) r1[a].addEventListener("click", function(){ setAffiliateOrderStatus(this.getAttribute("data-afford-ready"), "ready"); });
+        var r2 = document.querySelectorAll("[data-afford-paid]");
+        for (var b2 = 0; b2 < r2.length; b2++) r2[b2].addEventListener("click", function(){ setAffiliateOrderStatus(this.getAttribute("data-afford-paid"), "paid"); });
+      }
+      function setAffiliateOrderStatus(id, status){
+        adminApi("update-affiliate-order", { id: id, status: status }).then(function(){
+          for (var i = 0; i < adminAffOrders.length; i++) if (String(adminAffOrders[i].id) === String(id)) adminAffOrders[i].status = status;
+          renderAdminAffiliates();
+          if (affDetailCode) showAffDetail(affDetailCode);
+          toast(status === "ready" ? "Đã chuyển hoa hồng sang sẵn sàng trả" : "Đã đánh dấu trả hoa hồng");
+        }).catch(function(){ toast("Chưa cập nhật được — thử lại nhé"); });
+      }
+      function loadAdminAffiliates(){
+        adminApi("list-affiliates").then(function(d){
+          adminAffiliates = d.affiliates || []; adminAffOrders = d.affiliate_orders || [];
+          renderAdminAffiliates();
+        }).catch(function(){});
+      }
+
+      /* ---- Lưu sản phẩm / mã giảm giá / cài đặt lên máy chủ (có dự phòng xem thử) ---- */
+      function toDbProduct(p){
+        return { id: p.id, name: p.name, cat: p.cat, price: p.price || 0, old_price: p.oldPrice || 0,
+          hot: !!p.hot, link: p.link || "", description: p.desc || "",
+          includes: Array.isArray(p.includes) ? p.includes : [], img: p.img || "" };
+      }
+      function toDbPromo(p){
+        return { id: p.id, code: p.code, type: p.type, value: p.value,
+          expiry: p.expiry || null, active: !!p.active };
+      }
+      function saveProductToDb(p, baseMsg){
+        if (!adminAuthed || adminPreviewMode){
+          toast(baseMsg + " — chỉ lưu xem thử trong phiên này, chưa lưu lên máy chủ");
+          return;
+        }
+        toast(baseMsg);
+        adminApi("save-product", { product: toDbProduct(p) }).then(function(){
+          toast(baseMsg + " — đã lưu lên cơ sở dữ liệu");
+        }).catch(function(){
+          toast(baseMsg + " — chưa lưu lên máy chủ, chỉ xem thử trong phiên này");
+        });
+      }
+      function deleteProductFromDb(id){
+        if (!adminAuthed || adminPreviewMode) return;
+        adminApi("delete-product", { id: id }).catch(function(){});
+      }
+      function savePromoToDb(p, baseMsg){
+        if (!adminAuthed || adminPreviewMode){
+          toast(baseMsg + " — chỉ lưu xem thử trong phiên này, chưa lưu lên máy chủ");
+          return;
+        }
+        toast(baseMsg);
+        adminApi("save-promo", { promo: toDbPromo(p) }).then(function(){
+          toast(baseMsg + " — đã lưu lên cơ sở dữ liệu");
+        }).catch(function(){
+          toast(baseMsg + " — chưa lưu lên máy chủ, chỉ xem thử trong phiên này");
+        });
+      }
+      function deletePromoFromDb(id){
+        if (!adminAuthed || adminPreviewMode) return;
+        adminApi("delete-promo", { id: id }).catch(function(){});
+      }
+      function saveSettingsToDb(){
+        if (!adminAuthed || adminPreviewMode){
+          toast("Đã lưu xem thử trong phiên này — chưa lưu lên máy chủ (đăng nhập quản trị để lưu thật)");
+          return;
+        }
+        adminApi("save-settings", { settings: {
+          zalo: settings.zalo || "", bank: settings.bank || "", bank_bin: settings.bankBin || "",
+          bank_account: settings.bankAccount || "", bank_holder: settings.bankHolder || "", qr_img: settings.qrImg || ""
+        }}).then(function(){
+          toast("Đã lưu cài đặt lên cơ sở dữ liệu");
+        }).catch(function(){
+          toast("Chưa lưu lên máy chủ — đã lưu xem thử trong phiên này");
+        });
+      }
+
+      /* ============ Thông báo "Khách vừa mua" ============ */
+      // Số điện thoại ngẫu nhiên bên dưới CHỈ là dự phòng khi shop chưa có đơn thật nào.
+      // Khi bảng orders đã có đơn thật (đã nhận tiền), toast ưu tiên lấy số điện thoại
+      // của đơn thật gần nhất qua /api/latest-buyer (số đã che 4 số cuối thành xxxx ở
+      // phía máy chủ, không lộ số đầy đủ); chỉ dùng số ngẫu nhiên khi chưa có đơn thật.
+      var buyerToastTimer = null;
+      var buyerToastNext = null;
+      var buyerToastPhone = null; // số thật đã che (nếu có)
+      function randomPhone(){
+        var heads = ["090", "091", "092", "093", "094", "095", "096", "097", "098", "099"];
+        var head = heads[Math.floor(Math.random() * heads.length)];
+        var mid = String(100 + Math.floor(Math.random() * 900));
+        return head + mid + "xxxx";
+      }
+      function fetchBuyerPhone(){
+        return fetch("/api/latest-buyer").then(function(r){ return r.json(); }).then(function(d){
+          if (d && d.phone) buyerToastPhone = d.phone;
+        }).catch(function(){});
+      }
+      function buyerToastBlocked(){
+        if (document.querySelector(".modal.show")) return true;
+        if ($("cartDrawer") && $("cartDrawer").classList.contains("show")) return true;
+        if ($("adminSection") && $("adminSection").classList.contains("show")) return true;
+        return false;
+      }
+      function showBuyerToast(){
+        var el = $("buyerToast");
+        if (!el || !products.length) return;
+        if (buyerToastBlocked()){ scheduleBuyerToast(); return; }
+        var p = products[Math.floor(Math.random() * products.length)];
+        var phone = buyerToastPhone || randomPhone();
+        el.innerHTML = '<span class="bt-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>'
+          + '<span>Khách <b>' + esc(phone) + '</b> vừa mua <b>' + esc(p.name) + '</b></span>';
+        el.classList.add("show");
+        clearTimeout(buyerToastTimer);
+        buyerToastTimer = setTimeout(function(){ el.classList.remove("show"); }, 5000);
+        scheduleBuyerToast();
+      }
+      function scheduleBuyerToast(){
+        clearTimeout(buyerToastNext);
+        var delay = 20000 + Math.floor(Math.random() * 20000); // hiện lại sau 20–40 giây
+        buyerToastNext = setTimeout(showBuyerToast, delay);
+      }
 
       /* ============ Helpers ============ */
       function $(id){ return document.getElementById(id); }
@@ -2144,6 +2593,17 @@
             when: new Date()
           };
           orders.push(currentOrder);
+          sbInsert("orders", {
+            code: currentOrder.code,
+            customer_name: currentOrder.name,
+            customer_email: currentOrder.email,
+            customer_phone: currentOrder.phone,
+            items: currentOrder.items.map(function(id){ var p = byId(id); return p ? { id: p.id, name: p.name, price: p.price } : { id: id }; }),
+            total: currentOrder.total,
+            discount_code: appliedCode || "",
+            ref_code: incomingRef || "",
+            status: "pending"
+          }).catch(function(){});
           showPayment(currentOrder);
         });
       }
@@ -2170,7 +2630,7 @@
           + '<div class="steps">'
           + '<div class="step"><span class="sn">1</span><span>Mở app ngân hàng, quét mã QR ở trên (số tiền <b>'+fmt(o.total)+'</b> và nội dung <b>'+o.code+'</b> đã điền sẵn). Nếu chuyển thủ công, chép đúng số tiền và nội dung như câu lệnh ở trên.</span></div>'
           + '<div class="step"><span class="sn">2</span><span>Bấm nút “Tôi đã chuyển khoản” bên dưới.</span></div>'
-          + '<div class="step"><span class="sn">3</span><span>Shop đối chiếu đúng số tiền + mã đơn → link sản phẩm hiện ngay trong Kho của tôi và gửi về Gmail <b>'+esc(o.email)+'</b>.</span></div>'
+          + '<div class="step"><span class="sn">3</span><span>Shop đối chiếu đúng số tiền + mã đơn → nhắn Zalo giao link cho bạn, link cũng hiện trong Kho của tôi sau khi giao xong.</span></div>'
           + '</div>'
           + '<button class="btn btn-gold" id="paidBtn" type="button" style="width:100%;justify-content:center;padding:14px">Tôi đã chuyển khoản '+fmt(o.total)+'</button>'
           + '<button class="btn" id="copyOrderBtn" type="button" style="width:100%;justify-content:center;padding:12px;margin-top:8px">Sao chép toàn bộ thông tin đơn</button>';
@@ -2189,14 +2649,12 @@
         $("coBody").innerHTML =
             '<div class="success-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>'
           + '<p style="text-align:center;margin:0 0 6px"><b>Cảm ơn bạn!</b> Đơn <b>'+o.code+'</b> đã được ghi nhận.</p>'
-          + '<p style="text-align:center;color:var(--muted);font-size:15px;margin:0 0 16px">Shop sẽ kiểm tra tiền về. Khi xác nhận xong, link các sản phẩm dưới đây mở được ngay trong Kho của tôi — bạn dùng đúng Gmail <b>'+esc(o.email)+'</b> và số điện thoại đã điền để mở kho.</p>'
+          + '<p style="text-align:center;color:var(--muted);font-size:15px;margin:0 0 16px">Shop sẽ kiểm tra tiền về rồi nhắn Zalo giao link cho bạn. Sau khi giao xong, link cũng mở được trong Kho của tôi — bạn dùng đúng Gmail <b>'+esc(o.email)+'</b> và số điện thoại đã điền để mở kho.</p>'
           + o.items.map(function(id){
               var p = byId(id);
               return '<div class="vault-item"><div class="vi-name">'+esc(p.name)+'</div>'
                 + '<div class="vi-meta">Mã đơn '+o.code+'</div>'
-                + (p.link
-                    ? '<a class="btn btn-river" href="'+esc(p.link)+'" target="_blank" rel="noopener" style="padding:10px 16px">Mở trợ lý ngay</a>'
-                    : '<span class="link-miss">Shop đang cập nhật link — sẽ hiện ở đây khi sẵn sàng</span>')
+                + '<span class="link-miss">Shop kiểm tra tiền về rồi nhắn Zalo giao link cho bạn</span>'
                 + '</div>';
             }).join("")
           + '<button class="btn btn-gold" id="okDone" type="button" style="width:100%;justify-content:center;padding:13px;margin-top:6px">Xong, quay lại xem sản phẩm</button>';
@@ -2210,6 +2668,35 @@
         var phone = $("vPhone").value.trim();
         var box = $("vaultResults");
         if (!email || !phone){ box.innerHTML = '<div class="empty">Bạn nhập đủ Gmail và số điện thoại đã dùng khi mua nhé.</div>'; return; }
+        box.innerHTML = '<div class="empty">Đang tìm đơn của bạn…</div>';
+        // Ưu tiên tra cứu qua máy chủ: chỉ đơn ĐÃ GIAO qua Zalo mới hiện link.
+        fetch("/api/vault-lookup", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, phone: phone })
+        }).then(function(r){ return r.json(); }).then(function(d){
+          if (d && Array.isArray(d.orders)) renderVaultServer(d.orders, box);
+          else lookupVaultLocal(email, phone, box);
+        }).catch(function(){ lookupVaultLocal(email, phone, box); });
+      }
+      function renderVaultServer(list, box){
+        if (!list.length){
+          box.innerHTML = '<div class="empty">Chưa có đơn nào đã giao qua Zalo với Gmail và số điện thoại này. Shop giao link bằng tay qua Zalo sau khi nhận tiền — bạn kiểm tra lại thông tin đã điền lúc mua, hoặc nhắn Zalo cho shop để được tra giúp.</div>';
+          return;
+        }
+        var html = "";
+        list.forEach(function(o){
+          (o.items || []).forEach(function(it){
+            html += '<div class="vault-item"><div class="vi-name">'+esc(it.name || "")+'</div>'
+              + '<div class="vi-meta">Mã đơn '+esc(o.code)+'</div>'
+              + (it.link
+                  ? '<a class="btn btn-river" href="'+esc(it.link)+'" target="_blank" rel="noopener" style="padding:10px 16px">Mở trợ lý</a>'
+                  : '<span class="link-miss">Shop đang cập nhật link cho sản phẩm này</span>')
+              + '</div>';
+          });
+        });
+        box.innerHTML = html || '<div class="empty">Chưa có sản phẩm nào trong các đơn đã giao.</div>';
+      }
+      function lookupVaultLocal(email, phone, box){
         var mine = orders.filter(function(o){ return o.email===email && o.phone===phone; });
         if (!mine.length){
           box.innerHTML = '<div class="empty">Chưa thấy đơn nào khớp Gmail và số điện thoại này. Kiểm tra lại thông tin đã điền lúc mua, hoặc nhắn Zalo cho shop để được tra giúp.</div>';
@@ -2254,6 +2741,7 @@
           var p = byId(id);
           products = products.filter(function(x){return x.id!==id;});
           cart = cart.filter(function(x){return x!==id;});
+          deleteProductFromDb(id);
           renderAll();
           toast("Đã xóa “"+(p?p.name:"")+"”");
         });
@@ -2285,6 +2773,7 @@
           var gone = null;
           for (var k=0;k<promos.length;k++) if (promos[k].id===id) gone = promos[k];
           promos = promos.filter(function(x){return x.id!==id;});
+          deletePromoFromDb(id);
           if (gone && appliedCode===gone.code){ appliedCode = ""; $("discCode").value = ""; }
           renderPromos(); renderCart();
           toast("Đã xóa mã "+(gone?gone.code:""));
@@ -2323,12 +2812,13 @@
         }
         var data = { code: code, type: type, value: value, expiry: $("pExpiry").value || "", active: $("pActive").checked };
         if (id){
-          for (var j=0;j<promos.length;j++) if (promos[j].id===id){ for (var k in data) promos[j][k] = data[k]; }
-          toast("Đã cập nhật mã "+code);
+          var pr = null;
+          for (var j=0;j<promos.length;j++) if (promos[j].id===id){ for (var k in data) promos[j][k] = data[k]; pr = promos[j]; }
+          savePromoToDb(pr, "Đã cập nhật mã "+code);
         } else {
           data.id = "km" + Date.now().toString(36);
           promos.unshift(data);
-          toast("Đã tạo mã "+code+" — "+promoDesc(data));
+          savePromoToDb(data, "Đã tạo mã "+code+" — "+promoDesc(data));
         }
         $("promoForm").classList.add("hidden");
         renderPromos(); renderCart();
@@ -2382,11 +2872,11 @@
         if (id){
           var p = byId(id);
           for (var k in data) p[k] = data[k];
-          toast("Đã cập nhật “"+data.name+"”");
+          saveProductToDb(p, "Đã cập nhật “"+data.name+"”");
         } else {
           data.id = "sp" + Date.now().toString(36);
           products.unshift(data);
-          toast("Đã thêm “"+data.name+"” vào cửa hàng");
+          saveProductToDb(data, "Đã thêm “"+data.name+"” vào cửa hàng");
         }
         $("productForm").classList.add("hidden");
         renderAll();
@@ -2401,13 +2891,13 @@
       /* ============ Danh mục CTV: tính % hoa hồng theo giá bán ============ */
       function ctvTierForOrders(n){
         n = parseInt(n, 10) || 0;
-        if (n >= 30) return 15;
+        if (n >= 30) return 13;
         if (n >= 10) return 12;
         return 10;
       }
       function ctvComm(price, rate){ return Math.round((price || 0) * rate / 100); }
       function setCtvRate(rate, fromOrders){
-        ctvState.rate = [10, 12, 15].indexOf(rate) >= 0 ? rate : 10;
+        ctvState.rate = [10, 12, 13].indexOf(rate) >= 0 ? rate : 10;
         var btns = document.querySelectorAll("[data-ctv-rate]");
         for (var i = 0; i < btns.length; i++){
           btns[i].classList.toggle("on", parseInt(btns[i].getAttribute("data-ctv-rate"), 10) === ctvState.rate);
@@ -2417,13 +2907,13 @@
           if (fromOrders != null && fromOrders !== ""){
             var n = parseInt(fromOrders, 10) || 0;
             hint.innerHTML = "Với <b>" + n + " đơn/tháng</b>, mức của bạn là <b>" + ctvState.rate + "%</b>"
-              + (ctvState.rate === 10 ? " — bán thêm " + (10 - n) + " đơn nữa là lên 12%." : ctvState.rate === 12 ? " — bán thêm " + (30 - n) + " đơn nữa là lên 15%." : " — mức cao nhất, kèm hỗ trợ nội dung mẫu.");
+              + (ctvState.rate === 10 ? " — bán thêm " + (10 - n) + " đơn nữa là lên 12%." : ctvState.rate === 12 ? " — bán thêm " + (30 - n) + " đơn nữa là lên 13%." : " — mức cao nhất, kèm hỗ trợ nội dung mẫu.");
           } else if (ctvState.rate === 10){
             hint.innerHTML = "Đang xem ở mức <b>10%</b> — mức khởi đầu cho cộng tác viên mới (1–9 đơn/tháng).";
           } else if (ctvState.rate === 12){
             hint.innerHTML = "Đang xem ở mức <b>12%</b> — mức thân thiết (10–29 đơn/tháng).";
           } else {
-            hint.innerHTML = "Đang xem ở mức <b>15%</b> — mức đối tác (từ 30 đơn/tháng).";
+            hint.innerHTML = "Đang xem ở mức <b>13%</b> — mức đối tác (từ 30 đơn/tháng).";
           }
         }
         renderCtvCatalog();
@@ -2443,7 +2933,7 @@
         grid.innerHTML = list.map(function(p){
           var c = catOf(p.cat);
           var comm = ctvComm(p.price, ctvState.rate);
-          var ratesHtml = [10, 12, 15].map(function(r){
+          var ratesHtml = [10, 12, 13].map(function(r){
             return '<div class="ctv-rate' + (r === ctvState.rate ? " on" : "") + '"><span>' + r + '%</span><b>' + fmt(ctvComm(p.price, r)) + '</b></div>';
           }).join("");
           return '<article class="ctv-item">'
@@ -2601,6 +3091,10 @@
           status: "pending", clicks: 0, orders: []
         };
         affiliates.unshift(aff);
+        sbInsert("affiliates", {
+          code: aff.code, name: aff.name, email: aff.email, phone: aff.phone,
+          channel: aff.channel, bank: aff.bank, bank_account: aff.account, status: "pending"
+        }).catch(function(){});
         // Đăng ký xong là đăng nhập luôn bằng tài khoản vừa tạo: bảng chỉ hiện thu nhập của tài khoản này
         currentAff = aff;
         renderAffDashboard(aff);
@@ -2625,6 +3119,31 @@
       }
 
       document.addEventListener("DOMContentLoaded", function(){
+        // Mã giới thiệu ?ref= : ghi 1 lượt click, lưu mã 30 ngày để theo dõi đơn sau này
+        // (khách bấm link hôm nay, mua sau trong vòng 30 ngày thì đơn vẫn tính cho CTV đó).
+        try {
+          var refParam = new URLSearchParams(window.location.search).get("ref");
+          if (refParam){
+            incomingRef = String(refParam).trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20);
+            if (incomingRef){
+              // (a) ghi 1 lượt click cho cộng tác viên đó
+              sbInsert("affiliate_clicks", { aff_code: incomingRef }).catch(function(){});
+              // (b) lưu mã 30 ngày (localStorage) — đơn mua sau vẫn kèm mã này
+              try { localStorage.setItem("dinhRef", JSON.stringify({ code: incomingRef, until: Date.now() + 30 * 24 * 3600 * 1000 })); } catch (e2) {}
+            }
+          } else {
+            // Không có ?ref= trong link: khôi phục mã đã lưu (nếu còn hạn 30 ngày)
+            try {
+              var savedRef = JSON.parse(localStorage.getItem("dinhRef") || "null");
+              if (savedRef && savedRef.code && savedRef.until && Date.now() < savedRef.until) incomingRef = savedRef.code;
+              else localStorage.removeItem("dinhRef");
+            } catch (e3) {}
+          }
+        } catch (e) { incomingRef = ""; }
+        loadFromSupabase();
+        checkAdminSession();
+        fetchBuyerPhone();
+        setTimeout(showBuyerToast, 12000);
         // category select in admin form
         $("fCat").innerHTML = CATEGORIES.map(function(c){ return '<option value="'+c.id+'">'+esc(c.name)+'</option>'; }).join("");
         $("sBankBin").innerHTML = '<option value="">— Chọn ngân hàng —</option>' + BANKS.map(function(b){ return '<option value="'+b.bin+'">'+esc(b.name)+'</option>'; }).join("");
@@ -2677,6 +3196,10 @@
         }
         function tryShowZaloPopup(){
           if (zaloPopupShown || !zaloPopupEl) return;
+          if ($("adminSection") && $("adminSection").classList.contains("show")){
+            setTimeout(tryShowZaloPopup, 2500);
+            return;
+          }
           if (somethingOpen()){
             setTimeout(tryShowZaloPopup, 2500);
             return;
@@ -2699,8 +3222,14 @@
         $("adminToggle").addEventListener("click", function(){
           var s = $("adminSection");
           s.classList.toggle("show");
-          if (s.classList.contains("show")) s.scrollIntoView({behavior:"smooth"});
+          if (s.classList.contains("show")){ closeZaloPopup(); s.scrollIntoView({behavior:"smooth"}); }
         });
+        $("adminLoginBtn").addEventListener("click", doAdminLogin);
+        $("adminPass").addEventListener("keydown", function(ev){ if (ev.key === "Enter"){ ev.preventDefault(); doAdminLogin(); } });
+        $("adminLogoutBtn").addEventListener("click", adminLogout);
+        $("adminPreviewBtn").addEventListener("click", enterAdminPreview);
+        $("ordersReloadBtn").addEventListener("click", loadAdminOrders);
+        $("affiliatesReloadBtn").addEventListener("click", loadAdminAffiliates);
         $("addProductBtn").addEventListener("click", function(){ resetForm(); $("productForm").classList.remove("hidden"); $("productForm").scrollIntoView({behavior:"smooth", block:"start"}); });
         $("formCancel").addEventListener("click", function(){ $("productForm").classList.add("hidden"); });
         $("productForm").addEventListener("submit", saveProduct);
@@ -2741,6 +3270,7 @@
           toast(b && settings.bankAccount
             ? "Đã lưu — QR thanh toán sẽ tự sinh đúng số tiền từng đơn (" + b.name + " · " + settings.bankAccount + ")"
             : "Đã lưu cài đặt (chưa đủ ngân hàng + số tài khoản nên QR chưa tự sinh được)");
+          saveSettingsToDb();
         });
 
         // affiliate — danh mục CTV & máy tính hoa hồng
