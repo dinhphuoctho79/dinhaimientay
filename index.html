@@ -2465,7 +2465,6 @@
         var html = '<button class="chip'+(activeCat==="all"?" on":"")+'" data-cat="all" type="button">Tất cả<span class="n">'+products.length+'</span></button>';
         CATEGORIES.forEach(function(c){
           var n = products.filter(function(p){return p.cat===c.id;}).length;
-          if (!n) return;
           html += '<button class="chip'+(activeCat===c.id?" on":"")+'" data-cat="'+c.id+'" type="button">'+esc(c.name)+'<span class="n">'+n+'</span></button>';
         });
         $("catChips").innerHTML = html;
@@ -2477,10 +2476,8 @@
           });
         }
         $("statProducts").textContent = products.length;
-        var usedCats = {};
-        products.forEach(function(p){ usedCats[p.cat]=1; });
-        $("statCats").textContent = Object.keys(usedCats).length;
-        $("footCats").innerHTML = CATEGORIES.filter(function(c){return usedCats[c.id];}).map(function(c){
+        $("statCats").textContent = CATEGORIES.length;
+        $("footCats").innerHTML = CATEGORIES.map(function(c){
           return '<li><a href="#san-pham" data-footcat="'+c.id+'">'+esc(c.name)+'</a></li>';
         }).join("");
         var fc = $("footCats").querySelectorAll("[data-footcat]");
@@ -2507,6 +2504,10 @@
       }
       function renderProducts(){
         var list = visibleProducts();
+        var q = $("searchInput").value.trim();
+        $("emptyState").textContent = (activeCat !== "all" && !q && !list.length)
+          ? "Chưa có sản phẩm trong nhóm này — sắp có"
+          : "Không tìm thấy sản phẩm phù hợp. Thử từ khóa khác nhé.";
         $("emptyState").classList.toggle("hidden", list.length>0);
         $("productGrid").innerHTML = list.map(function(p){
           var c = catOf(p.cat);
@@ -3108,9 +3109,9 @@
         var cur = sel.value;
         sel.innerHTML = '<option value="all">Tất cả nhóm (' + products.length + ' sản phẩm)</option>' + CATEGORIES.map(function(c){
           var n = products.filter(function(p){ return p.cat === c.id; }).length;
-          return n ? '<option value="' + c.id + '">' + esc(c.name) + ' (' + n + ')</option>' : '';
+          return '<option value="' + c.id + '">' + esc(c.name) + ' (' + n + ')</option>';
         }).join("");
-        var ok = cur === "all" || CATEGORIES.some(function(c){ return c.id === cur && products.some(function(p){ return p.cat === cur; }); });
+        var ok = cur === "all" || CATEGORIES.some(function(c){ return c.id === cur; });
         if (ok) sel.value = cur; else { sel.value = "all"; ctvState.cat = "all"; }
       }
       function renderCtvCatalog(){
