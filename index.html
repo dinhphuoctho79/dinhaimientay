@@ -271,7 +271,7 @@
         align-self:flex-start;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.2px;
       }
       .card h3{margin:0;font-size:18px;line-height:1.3}
-      .card .desc{margin:0;color:var(--muted);font-size:14px;flex:1}
+      .card .desc{margin:0;color:var(--muted);font-size:14px;flex:1;text-align:left;overflow-wrap:break-word}
       .price-row{display:flex;align-items:baseline;gap:10px;margin-top:2px}
       .price{font-size:21px;font-weight:900;color:var(--river-deep)}
       .old-price{color:var(--muted);text-decoration:line-through;font-size:15px;font-weight:600}
@@ -940,6 +940,14 @@
           </div>
         </div>
         <div class="free-grid" id="freeGrid"></div>
+        <article class="free-card" style="margin-top:16px;border-color:var(--river)">
+          <div class="free-top"><span class="free-tag">Nhóm Zalo</span><span class="free-price">MIỄN PHÍ</span></div>
+          <h3>Nhóm Zalo chia sẻ tài khoản miễn phí</h3>
+          <p>Tham gia nhóm Zalo để nhận tài khoản dùng thử miễn phí do shop chia sẻ — vào nhóm là thấy, không cần mua hàng.</p>
+          <div class="free-btns">
+            <a class="btn btn-river" href="https://zalo.me/g/ildgjitpotmqr57qntjl" target="_blank" rel="noopener">Tham gia nhóm Zalo</a>
+          </div>
+        </article>
       </section>
 
       <!-- CUSTOM SERVICES -->
@@ -1548,6 +1556,7 @@
             <ul>
               <li>Fanpage: <a href="https://www.facebook.com/dinhaimientay" target="_blank" rel="noopener">fb.com/dinhaimientay</a></li>
               <li>Hotline: <a href="tel:0386435510">038.643.5510</a> · <a href="https://zalo.me/0386435510" target="_blank" rel="noopener">Nhắn Zalo</a></li>
+              <li>Nhóm Zalo chia sẻ tài khoản miễn phí: <a href="https://zalo.me/g/ildgjitpotmqr57qntjl" target="_blank" rel="noopener">Tham gia nhóm</a></li>
               <li>Gmail: <a href="mailto:dinhaimientay@gmail.com">dinhaimientay@gmail.com</a></li>
               <li>Địa chỉ: Mỹ Phước — Thành Phố Cần Thơ</li>
             </ul>
@@ -1665,6 +1674,20 @@
           </div>
           <button class="btn btn-river" id="vaultLookup" type="button" style="width:100%;justify-content:center;padding:13px">Mở kho của tôi</button>
           <div id="vaultResults" style="margin-top:16px"></div>
+          <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:16px">
+            <h4 style="margin:0 0 4px">Tra cứu đơn hàng bằng mã đơn</h4>
+            <p style="margin:0 0 10px;color:var(--muted);font-size:14px">Không nhớ Gmail đã mua? Nhập mã đơn và số điện thoại đã dùng khi mua để xem trạng thái đơn và lấy lại link.</p>
+            <div class="field">
+              <label for="olCode">Mã đơn</label>
+              <input id="olCode" placeholder="VD: DINH123456" />
+            </div>
+            <div class="field">
+              <label for="olPhone">Số điện thoại đã dùng khi mua</label>
+              <input id="olPhone" inputmode="tel" placeholder="09xx xxx xxx" />
+            </div>
+            <button class="btn btn-river" id="orderLookupBtn" type="button" style="width:100%;justify-content:center;padding:13px">Tra cứu đơn hàng</button>
+            <div id="orderLookupResults" style="margin-top:16px"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -2145,18 +2168,41 @@
       }
 
       /* ============ Thông báo "Khách vừa mua" ============ */
-      // Số điện thoại ngẫu nhiên bên dưới CHỈ là dự phòng khi shop chưa có đơn thật nào.
+      // Số điện thoại trong toast "Khách vừa mua" CHỈ là dự phòng khi shop chưa có đơn thật nào.
       // Khi bảng orders đã có đơn thật (đã nhận tiền), toast ưu tiên lấy số điện thoại
       // của đơn thật gần nhất qua /api/latest-buyer (số đã che 4 số cuối thành xxxx ở
-      // phía máy chủ, không lộ số đầy đủ); chỉ dùng số ngẫu nhiên khi chưa có đơn thật.
+      // phía máy chủ, không lộ số đầy đủ); chỉ dùng bộ số dự phòng khi chưa có đơn thật.
+      // Bộ dự phòng gồm 20 số cố định (chỉ hiện 6 số đầu + xxxx), xáo trộn rồi xoay
+      // vòng liên tục, không lặp ngay số vừa hiện.
       var buyerToastTimer = null;
       var buyerToastNext = null;
       var buyerToastPhone = null; // số thật đã che (nếu có)
+      var TOAST_PHONES = [
+        "090312xxxx", "091458xxxx", "092673xxxx", "093821xxxx", "094157xxxx",
+        "095246xxxx", "096735xxxx", "097482xxxx", "098915xxxx", "099364xxxx",
+        "090728xxxx", "091593xxxx", "092846xxxx", "093517xxxx", "094269xxxx",
+        "095731xxxx", "096184xxxx", "097652xxxx", "098347xxxx", "099528xxxx"
+      ];
+      var toastPhonePool = [];
+      var toastPhoneLast = "";
+      function shuffledToastPhones(){
+        var arr = TOAST_PHONES.slice();
+        for (var i = arr.length - 1; i > 0; i--){
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+        }
+        return arr;
+      }
       function randomPhone(){
-        var heads = ["090", "091", "092", "093", "094", "095", "096", "097", "098", "099"];
-        var head = heads[Math.floor(Math.random() * heads.length)];
-        var mid = String(100 + Math.floor(Math.random() * 900));
-        return head + mid + "xxxx";
+        if (!toastPhonePool.length){
+          toastPhonePool = shuffledToastPhones();
+          if (toastPhonePool[0] === toastPhoneLast && toastPhonePool.length > 1){
+            toastPhonePool.push(toastPhonePool.shift());
+          }
+        }
+        var phone = toastPhonePool.shift();
+        toastPhoneLast = phone;
+        return phone;
       }
       function fetchBuyerPhone(){
         return fetch("/api/latest-buyer").then(function(r){ return r.json(); }).then(function(d){
@@ -2504,7 +2550,7 @@
             '<div class="modal-cover" style="background:'+c.color+'">'+coverHTML(p,true)
           + (p.hot ? '<span class="badge-hot">BÁN CHẠY</span>' : '') + '</div>'
           + '<span class="cat-tag" style="background:'+c.soft+';color:'+c.ink+'">'+esc(c.name)+'</span>'
-          + '<p style="font-size:16px;margin:12px 0 4px">'+esc(p.desc)+'</p>'
+          + '<p style="font-size:16px;margin:12px 0 4px;text-align:left;white-space:pre-line;overflow-wrap:break-word">'+esc(p.desc)+'</p>'
           + '<h4 style="margin:16px 0 8px">Bên trong có gì</h4>'
           + '<div class="steps">' + (p.includes||[]).map(function(x){
               return '<div class="step"><span class="sn">✓</span><span>'+esc(x)+'</span></div>';
@@ -2706,6 +2752,7 @@
         $("coBody").innerHTML =
             '<div class="success-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>'
           + '<p style="text-align:center;margin:0 0 6px"><b>Cảm ơn bạn!</b> Đơn <b>'+o.code+'</b> đã được ghi nhận.</p>'
+          + '<p style="text-align:center;font-size:14px;margin:0 0 16px">Lưu mã đơn này để tra cứu đơn hàng sau — nhập mã đơn và số điện thoại đã mua trong mục “Kho của tôi”.</p>'
           + '<p style="text-align:center;color:var(--muted);font-size:15px;margin:0 0 16px">Shop sẽ kiểm tra tiền về rồi nhắn Zalo giao link cho bạn.' + (o.email ? ' Sau khi giao xong, link cũng mở được trong Kho của tôi — bạn dùng đúng Gmail <b>'+esc(o.email)+'</b> và số điện thoại đã điền để mở kho.' : ' Giữ lại mã đơn <b>'+o.code+'</b> — sau này tra cứu đơn bằng mã đơn và số điện thoại đã điền.') + '</p>'
           + o.items.map(function(id){
               var p = byId(id);
@@ -2746,12 +2793,13 @@
             html += '<div class="vault-item"><div class="vi-name">'+esc(it.name || "")+'</div>'
               + '<div class="vi-meta">Mã đơn '+esc(o.code)+'</div>'
               + (it.link
-                  ? '<a class="btn btn-river" href="'+esc(it.link)+'" target="_blank" rel="noopener" style="padding:10px 16px">Mở trợ lý</a>'
+                  ? '<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-river" href="'+esc(it.link)+'" target="_blank" rel="noopener" style="padding:10px 16px">Mở trợ lý</a><button class="btn" type="button" data-copy-link="'+esc(it.link)+'" style="padding:10px 16px">Sao chép link</button></div>'
                   : '<span class="link-miss">Shop đang cập nhật link cho sản phẩm này</span>')
               + '</div>';
           });
         });
         box.innerHTML = html || '<div class="empty">Chưa có sản phẩm nào trong các đơn đã giao.</div>';
+        bindCopyLinks(box);
       }
       function lookupVaultLocal(email, phone, box){
         var mine = orders.filter(function(o){ return o.email===email && o.phone===phone; });
@@ -2766,12 +2814,91 @@
             html += '<div class="vault-item"><div class="vi-name">'+esc(p.name)+'</div>'
               + '<div class="vi-meta">Mã đơn '+o.code+' · '+o.when.toLocaleDateString("vi-VN")+'</div>'
               + (p.link
-                  ? '<a class="btn btn-river" href="'+esc(p.link)+'" target="_blank" rel="noopener" style="padding:10px 16px">Mở trợ lý</a>'
+                  ? '<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-river" href="'+esc(p.link)+'" target="_blank" rel="noopener" style="padding:10px 16px">Mở trợ lý</a><button class="btn" type="button" data-copy-link="'+esc(p.link)+'" style="padding:10px 16px">Sao chép link</button></div>'
                   : '<span class="link-miss">Shop đang cập nhật link cho sản phẩm này</span>')
               + '</div>';
           });
         });
         box.innerHTML = html;
+        bindCopyLinks(box);
+      }
+      function bindCopyLinks(box){
+        var btns = box.querySelectorAll("[data-copy-link]");
+        for (var i=0;i<btns.length;i++){
+          btns[i].addEventListener("click", function(){
+            copyText(this.getAttribute("data-copy-link"), "Đã sao chép link");
+          });
+        }
+      }
+      /* ============ Tra cứu đơn hàng bằng mã đơn ============ */
+      // Tra cứu bằng mã đơn + số điện thoại (dành cho khách mua nhanh không để
+      // lại Gmail, hoặc khách không nhớ Gmail đã mua). Chỉ hiện link khi đơn
+      // ĐÃ GIAO qua Zalo; chưa giao thì chỉ hiện trạng thái đơn.
+      function lookupOrderByCode(){
+        var code = $("olCode").value.trim().toUpperCase();
+        var phone = $("olPhone").value.replace(/\D/g, "");
+        var box = $("orderLookupResults");
+        if (!code || !phone){ box.innerHTML = '<div class="empty">Bạn nhập mã đơn và số điện thoại đã dùng khi mua nhé.</div>'; return; }
+        box.innerHTML = '<div class="empty">Đang tìm đơn của bạn…</div>';
+        fetch("/api/order-lookup", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: code, phone: phone })
+        }).then(function(r){ return r.json(); }).then(function(d){
+          if (d && d.order) renderOrderLookup(d.order, box);
+          else if (d && d.error === "not-configured") lookupOrderLocal(code, phone, box);
+          else box.innerHTML = '<div class="empty">Không tìm thấy đơn nào khớp mã đơn và số điện thoại này. Kiểm tra lại mã đơn (ghi trong nội dung chuyển khoản và màn hình sau khi đặt hàng), hoặc nhắn Zalo cho shop để được tra giúp.</div>';
+        }).catch(function(){ lookupOrderLocal(code, phone, box); });
+      }
+      function renderOrderLookup(o, box){
+        var delivered = o.status === "delivered";
+        var html = '<div class="vault-item"><div class="vi-name">Đơn ' + esc(o.code) + '</div>'
+          + '<div class="vi-meta">Trạng thái: <b>' + esc(orderStatusLabel(o.status)) + '</b> · Tổng tiền: <b>' + fmt(o.total) + '</b>' + (o.created_at ? ' · ' + new Date(o.created_at).toLocaleDateString("vi-VN") : '') + '</div></div>';
+        (o.items || []).forEach(function(it){
+          var isAccount = it.cat === "san-pham-so";
+          var dl = it.delivery === "upgrade" ? "Nâng cấp tài khoản" + (it.upgrade_email ? ": " + it.upgrade_email : "") : (it.delivery ? "Nhận tài khoản mới" : "");
+          var btns;
+          if (isAccount){
+            btns = delivered
+              ? '<span style="color:var(--leaf);font-weight:700;font-size:13px">Shop đã giao tài khoản qua Zalo — kiểm tra tin nhắn Zalo của shop nhé</span>'
+              : '<span class="link-miss">Shop kiểm tra tiền về rồi nhắn Zalo giao tài khoản cho bạn</span>';
+          } else if (delivered && it.link){
+            btns = '<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-river" href="' + esc(it.link) + '" target="_blank" rel="noopener" style="padding:10px 16px">Mở trợ lý</a><button class="btn" type="button" data-copy-link="' + esc(it.link) + '" style="padding:10px 16px">Sao chép link</button></div>';
+          } else if (delivered){
+            btns = '<span class="link-miss">Shop đang cập nhật link cho sản phẩm này</span>';
+          } else {
+            btns = '<span class="link-miss">Shop kiểm tra tiền về rồi nhắn Zalo giao link cho bạn</span>';
+          }
+          html += '<div class="vault-item"><div class="vi-name">' + esc(it.name || "") + '</div>'
+            + '<div class="vi-meta">' + (dl ? esc(dl) : "Mã đơn " + esc(o.code)) + '</div>'
+            + btns + '</div>';
+        });
+        box.innerHTML = html || '<div class="empty">Đơn này chưa có sản phẩm nào.</div>';
+        bindCopyLinks(box);
+      }
+      function lookupOrderLocal(code, phone, box){
+        var mine = orders.filter(function(o){ return o.code === code && o.phone === phone; });
+        if (!mine.length){
+          box.innerHTML = '<div class="empty">Không tìm thấy đơn nào khớp mã đơn và số điện thoại này trong phiên xem này. Kiểm tra lại mã đơn, hoặc nhắn Zalo cho shop để được tra giúp.</div>';
+          return;
+        }
+        var o = mine[0];
+        var html = '<div class="vault-item"><div class="vi-name">Đơn ' + esc(o.code) + '</div>'
+          + '<div class="vi-meta">Đơn tạo trong phiên xem này · Tổng tiền: <b>' + fmt(o.total) + '</b> · ' + esc(orderStatusLabel("pending")) + '</div></div>';
+        o.items.forEach(function(id){
+          var p = byId(id); if (!p) return;
+          var isAccount = p.cat === "san-pham-so";
+          var dl = isAccount ? (o.delivery === "upgrade" ? "Nâng cấp tài khoản" + (o.upgradeEmail ? ": " + o.upgradeEmail : "") : "Nhận tài khoản mới") : "";
+          var btns = isAccount
+            ? '<span class="link-miss">Shop kiểm tra tiền về rồi nhắn Zalo giao tài khoản cho bạn</span>'
+            : (p.link
+                ? '<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-river" href="' + esc(p.link) + '" target="_blank" rel="noopener" style="padding:10px 16px">Mở trợ lý</a><button class="btn" type="button" data-copy-link="' + esc(p.link) + '" style="padding:10px 16px">Sao chép link</button></div>'
+                : '<span class="link-miss">Shop đang cập nhật link cho sản phẩm này</span>');
+          html += '<div class="vault-item"><div class="vi-name">' + esc(p.name) + '</div>'
+            + '<div class="vi-meta">' + (dl ? esc(dl) : "Mã đơn " + esc(o.code)) + '</div>'
+            + btns + '</div>';
+        });
+        box.innerHTML = html;
+        bindCopyLinks(box);
       }
 
       /* ============ Admin ============ */
@@ -3247,6 +3374,7 @@
         $("navVault").addEventListener("click", function(ev){ ev.preventDefault(); openVault(); });
         $("footVault").addEventListener("click", function(ev){ ev.preventDefault(); openVault(); });
         $("vaultLookup").addEventListener("click", lookupVault);
+        $("orderLookupBtn").addEventListener("click", lookupOrderByCode);
 
         var zalos = document.querySelectorAll("[data-zalo]");
         for (var z=0;z<zalos.length;z++) zalos[z].addEventListener("click", function(ev){ ev.preventDefault(); goZalo(); });
