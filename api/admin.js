@@ -58,9 +58,10 @@ function sb(path, method, body, prefer) {
   });
 }
 
-// Mức hoa hồng theo tổng số đơn của CTV: 1–9 đơn 10%, 10–29 đơn 12%, từ 30 đơn 15%.
+// Mức hoa hồng theo tổng số đơn của CTV: 1–9 đơn 10%, 10–29 đơn 12%, từ 30 đơn 13%.
+// Hoa hồng tính trên giá trị đơn SAU giảm giá (order.total là tổng tiền khách phải chuyển).
 function tierRate(orderCount) {
-  if (orderCount >= 30) return 15;
+  if (orderCount >= 30) return 13;
   if (orderCount >= 10) return 12;
   return 10;
 }
@@ -135,6 +136,12 @@ module.exports = async (req, res) => {
       // Khi chủ shop bấm "Đã giao qua Zalo": nếu đơn có mã giới thiệu thì ghi
       // hoa hồng cho CTV đó (tính theo bậc, trạng thái giữ).
       if (status === "delivered" && order && order.ref_code) {
+        // Chỉ ghi hoa hồng khi mã giới thiệu thuộc về 1 CTV đã đăng ký
+        // (tránh ghi cho mã gõ bừa trong link).
+        const aff = await sb(
+          "affiliates?select=code&code=eq." + encodeURIComponent(order.ref_code)
+        );
+        if (!aff || !aff.length) return res.status(200).json({ order });
         const existing = await sb(
           "affiliate_orders?select=id&order_code=eq." +
             encodeURIComponent(code)
